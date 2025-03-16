@@ -12,24 +12,89 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+enum UserRole {
+  ADMIN
+  STUDENT
+  ADVISOR
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique @db.VarChar(65)
+  password String   @db.VarChar(45)
+  role     UserRole
+  admin    Admin?
+  student  Student?
+  advisor  Advisor?
+  
+  @@map("user")
+}
+
+model Admin {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  user      User      @relation(fields: [userId], references: [id])
+  adminLogs AdminLog[]
+  appointments Appointment[]
+  feedbacks  Feedback[]
+
+  @@map("admin")
+}
+
+model AdminLog {
+  id      Int      @id @default(autoincrement())
+  adminId Int
+  action  String   @db.VarChar(255)
+  date    DateTime @default(now())
+
+  admin   Admin    @relation(fields: [adminId], references: [id])
+
+  @@map("admin_log")
+}
+
+model Student {
+  id            Int       @id @default(autoincrement())
+  userId        Int       @unique
+  studentIdCard String    @unique @map("student_id_card") @db.VarChar(15)
+  firstName     String    @map("first_name") @db.VarChar(45)
+  lastName      String    @map("last_name") @db.VarChar(45)
+  picture       String    @db.VarChar(45)
+  departmentId  Int       @map("Department_id")
+  degreeId      Int       @map("Degree_id")
+  department    Department @relation(fields: [departmentId], references: [id])
+  degree        Degree     @relation(fields: [degreeId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+  feedbacks    Feedback[]
+
+  @@map("student")
+}
+
+model Advisor {
+  id                 Int              @id @default(autoincrement())
+  userId             Int              @unique
+  firstName          String           @map("first_name") @db.VarChar(45)
+  lastName           String           @map("last_name") @db.VarChar(45)
+  picture            String           @db.VarChar(45)
+  academicPositionId Int              @map("Academic_position_id")
+  departmentId       Int              @map("Department_id")
+  user              User              @relation(fields: [userId], references: [id])
+  academicPosition   AcademicPosition @relation(fields: [academicPositionId], references: [id])
+  department         Department       @relation(fields: [departmentId], references: [id])
+  announcements      Announcement[]
+  appointments       Appointment[]
+  feedbacks          Feedback[]
+
+  @@map("advisor")
+}
+
 model AcademicPosition {
   id                   Int       @id @default(autoincrement())
   academicPositionName String    @map("academic_position_name") @db.VarChar(100)
   advisors             Advisor[]
 
   @@map("academic_position")
-}
-
-model Admin {
-  id           Int          @id @default(autoincrement())
-  username     String       @unique @db.VarChar(65)
-  password     String       @db.VarChar(45)
-  advisors     Advisor[]
-  adminLogs    AdminLog[]
-  appointments Appointment[]
-  feedbacks    Feedback[]
-
-  @@map("admin")
 }
 
 model Department {
@@ -42,89 +107,12 @@ model Department {
   @@map("department")
 }
 
-model Advisor {
-  id                 Int              @id @default(autoincrement())
-  firstName          String           @map("first_name") @db.VarChar(45)
-  lastName           String           @map("last_name") @db.VarChar(45)
-  picture            String           @db.VarChar(45)
-  username           String           @map("usename") @unique @db.VarChar(45)
-  password           String           @db.VarChar(45)
-  academicPositionId Int              @map("Academic_position_id")
-  departmentId       Int              @map("Department_id")
-  adminId            Int              @map("Admin_id")
-  academicPosition   AcademicPosition @relation(fields: [academicPositionId], references: [id])
-  department         Department       @relation(fields: [departmentId], references: [id])
-  admin              Admin            @relation(fields: [adminId], references: [id])
-  adminLogs          AdminLog[]
-  announcements      Announcement[]
-  appointments       Appointment[]
-  feedbacks          Feedback[]
-
-  // @@id([id, adminId, departmentId, academicPositionId])
-  @@map("advisor")
-}
-
 model Degree {
   id         Int       @id @default(autoincrement())
   degreeName String    @map("degree_name") @db.VarChar(45)
   students   Student[]
 
   @@map("degree")
-}
-
-model Student {
-  id            Int           @id @default(autoincrement())
-  studentIdCard String        @unique @map("student_id_card") @db.VarChar(15)
-  firstName     String        @map("first_name") @db.VarChar(45)
-  lastName      String        @map("last_name") @db.VarChar(45)
-  picture       String        @db.VarChar(45)
-  username      String        @map("usename") @unique @db.VarChar(45)
-  password      String        @db.VarChar(45)
-  departmentId  Int           @map("Department_id")
-  degreeId      Int           @map("Degree_id")
-  department    Department    @relation(fields: [departmentId], references: [id])
-  degree        Degree        @relation(fields: [degreeId], references: [id])
-  adminLogs     AdminLog[]
-  appointments  Appointment[]
-  feedbacks     Feedback[]
-
-  // @@id([id, departmentId, degreeId])
-  @@map("student")
-}
-
-model AdminLog {
-  id        Int     @id @default(autoincrement())
-  action    String  @db.VarChar(255)
-  studentId Int     @map("Student_id")
-  advisorId Int     @map("Advisor_id")
-  adminId   Int     @map("Admin_id")
-  student   Student @relation(fields: [studentId], references: [id])
-  advisor   Advisor @relation(fields: [advisorId], references: [id])
-  admin     Admin   @relation(fields: [adminId], references: [id])
-
-  // @@id([id, adminId, advisorId, studentId])
-  @@map("admin_log")
-}
-
-model Announcement {
-  id          Int      @id @default(autoincrement())
-  topic       String   @db.VarChar(70)
-  description String   @db.VarChar(225)
-  file        String?  @db.VarChar(45)
-  postedDate  DateTime @map("posted_date")
-  advisorId   Int      @map("Advisor_id")
-  advisor     Advisor  @relation(fields: [advisorId], references: [id])
-
-  // @@id([id, advisorId])
-  @@map("announcement")
-}
-
-model StatusAppointment {
-  id           Int           @id @default(autoincrement())
-  status       String        @db.VarChar(45)
-  appointments Appointment[]
-
-  @@map("status_appointment")
 }
 
 model Appointment {
@@ -143,31 +131,39 @@ model Appointment {
   statusAppointment          StatusAppointment @relation(fields: [statusAppointmentId], references: [id])
   admin                      Admin             @relation(fields: [adminId], references: [id])
 
-  // @@id([id, advisorId, studentId, statusAppointmentId])
   @@map("appointment")
 }
 
-model Responder {
-  id        Int        @id
-  responder String     @db.VarChar(45)
-  feedbacks Feedback[]
+model StatusAppointment {
+  id           Int           @id @default(autoincrement())
+  status       String        @db.VarChar(45)
+  appointments Appointment[]
 
-  @@map("responder")
+  @@map("status_appointment")
+}
+
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  topic       String   @db.VarChar(70)
+  description String   @db.VarChar(225)
+  file        String?  @db.VarChar(45)
+  postedDate  DateTime @map("posted_date")
+  advisorId   Int      @map("Advisor_id")
+  advisor     Advisor  @relation(fields: [advisorId], references: [id])
+
+  @@map("announcement")
 }
 
 model Feedback {
   id         Int       @id @default(autoincrement())
   feedback   String?   @db.VarChar(255)
-  timestamp  DateTime? @map("timesteamp")
+  timestamp  DateTime? @map("timestamp")
   studentId  Int       @map("Student_id")
   advisorId  Int       @map("Advisor_id")
-  responderId Int      @map("Responder_id")
   adminId    Int       @map("Admin_id")
   student    Student   @relation(fields: [studentId], references: [id])
   advisor    Advisor   @relation(fields: [advisorId], references: [id])
-  responder  Responder @relation(fields: [responderId], references: [id])
   admin      Admin     @relation(fields: [adminId], references: [id])
 
-  // @@id([id, studentId, advisorId, responderId])
   @@map("feedback")
 }
