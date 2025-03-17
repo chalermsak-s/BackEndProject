@@ -13,128 +13,157 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator dbml {
-  provider = "prisma-dbml-generator"
+enum UserRole {
+  ADMIN
+  STUDENT
+  ADVISOR
 }
+
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  password  String
-  role      Role[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  admin     Admin?
-  teacher   Teacher?
-  student   Student?
-}
-
-model Role {
-  id          Int        @id @default(autoincrement())
-  name        String     @unique
-  users       User[]
+  id       Int      @id @default(autoincrement())
+  username String   @unique @db.VarChar(65)
+  password String   @db.VarChar(45)
+  role     UserRole
+  admin    Admin?
+  student  Student?
+  advisor  Advisor?
+  
+  @@map("user")
 }
 
 model Admin {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int       @id @default(autoincrement())
+  userId    Int       @unique
+  user      User      @relation(fields: [userId], references: [id])
+  adminLogs AdminLog[]
+  appointments Appointment[]
+  feedbacks  Feedback[]
+
+  @@map("admin")
+}
+
+model AdminLog {
+  id      Int      @id @default(autoincrement())
+  adminId Int
+  action  String   @db.VarChar(255)
+  date    DateTime @default(now())
+
+  admin   Admin    @relation(fields: [adminId], references: [id])
+
+  @@map("admin_log")
 }
 
 model Student {
-  id             Int      @id @default(autoincrement())
-  userId         Int      @unique
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  studentId      String   @unique
-  firstName      String
-  lastName       String
-  profileImage   String?
-  departmentId   Int
-  department     Department @relation(fields: [departmentId], references: [id])
-  advisorId      Int?
-  advisor        Teacher?  @relation(fields: [advisorId], references: [id])
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            Int       @id @default(autoincrement())
+  userId        Int       @unique
+  studentIdCard String    @unique @map("student_id_card") @db.VarChar(15)
+  firstName     String    @map("first_name") @db.VarChar(45)
+  lastName      String    @map("last_name") @db.VarChar(45)
+  picture       String    @db.VarChar(45)
+  departmentId  Int       @map("Department_id")
+  degreeId      Int       @map("Degree_id")
+  department    Department @relation(fields: [departmentId], references: [id])
+  degree        Degree     @relation(fields: [degreeId], references: [id])
+  user         User        @relation(fields: [userId], references: [id])
+  appointments Appointment[]
+  feedbacks    Feedback[]
 
-  comments       Comment[]
-  appointments   Appointment[]
+  @@map("student")
 }
-model Teacher {
-  id              Int      @id @default(autoincrement())
-  userId          Int      @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  academicTitle   String?
-  firstName       String
-  lastName        String
-  profileImage    String?
-  departmentId    Int
-  department      Department @relation(fields: [departmentId], references: [id])
-  isAdvisor       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 
-  advisedStudents Student[]
-  comments        Comment[]
-  announcements   Announcement[]
-  appointments    Appointment[]
+model Advisor {
+  id                 Int              @id @default(autoincrement())
+  userId             Int              @unique
+  firstName          String           @map("first_name") @db.VarChar(45)
+  lastName           String           @map("last_name") @db.VarChar(45)
+  picture            String           @db.VarChar(45)
+  academicPositionId Int              @map("Academic_position_id")
+  departmentId       Int              @map("Department_id")
+  user              User              @relation(fields: [userId], references: [id])
+  academicPosition   AcademicPosition @relation(fields: [academicPositionId], references: [id])
+  department         Department       @relation(fields: [departmentId], references: [id])
+  announcements      Announcement[]
+  appointments       Appointment[]
+  feedbacks          Feedback[]
+
+  @@map("advisor")
+}
+
+model AcademicPosition {
+  id                   Int       @id @default(autoincrement())
+  academicPositionName String    @map("academic_position_name") @db.VarChar(100)
+  advisors             Advisor[]
+
+  @@map("academic_position")
 }
 
 model Department {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?   @db.Text
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             Int       @id @default(autoincrement())
+  initials       String    @unique @db.VarChar(255)
+  departmentName String    @unique @map("department_name") @db.VarChar(255)
+  advisors       Advisor[]
+  students       Student[]
 
-  teachers    Teacher[]
-  students    Student[]
+  @@map("department")
 }
 
-model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String   @db.Text
-  teacherId Int
-  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  studentId Int
-  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  parentId  Int?
-  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id])
-  replies   Comment[] @relation("CommentReplies")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+model Degree {
+  id         Int       @id @default(autoincrement())
+  degreeName String    @map("degree_name") @db.VarChar(45)
+  students   Student[]
 
-model Announcement {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?  @db.Text
-  filePath  String?
-  teacherId Int
-  teacher   Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  @@map("degree")
 }
 
 model Appointment {
-  id            Int               @id @default(autoincrement())
-  subject       String
-  description   String?           @db.Text
-  requestDate   DateTime
-  status        AppointmentStatus @default(PENDING)
-  studentId     Int
-  student       Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  teacherId     Int
-  teacher       Teacher           @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  confirmedDate DateTime?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
+  id                         Int               @id @default(autoincrement())
+  topic                      String            @db.VarChar(70)
+  description                String            @db.VarChar(255)
+  requestedDate              DateTime          @map("requested_date")
+  appointmentRequestDateTime DateTime          @map("appointment_request_date_time")
+  studentConfirmation        Int               @map("student_confirmation") @db.TinyInt
+  studentId                  Int               @map("Student_id")
+  advisorId                  Int               @map("Advisor_id")
+  statusAppointmentId        Int               @map("Status_appointment_id")
+  adminId                    Int               @map("Admin_id")
+  student                    Student           @relation(fields: [studentId], references: [id])
+  advisor                    Advisor           @relation(fields: [advisorId], references: [id])
+  statusAppointment          StatusAppointment @relation(fields: [statusAppointmentId], references: [id])
+  admin                      Admin             @relation(fields: [adminId], references: [id])
+
+  @@map("appointment")
 }
 
-enum AppointmentStatus {
-  PENDING
-  PROPOSED
-  CONFIRMED
-  CANCELED
+model StatusAppointment {
+  id           Int           @id @default(autoincrement())
+  status       String        @db.VarChar(45)
+  appointments Appointment[]
+
+  @@map("status_appointment")
+}
+
+model Announcement {
+  id          Int      @id @default(autoincrement())
+  topic       String   @db.VarChar(70)
+  description String   @db.VarChar(225)
+  file        String?  @db.VarChar(45)
+  postedDate  DateTime @map("posted_date")
+  advisorId   Int      @map("Advisor_id")
+  advisor     Advisor  @relation(fields: [advisorId], references: [id])
+
+  @@map("announcement")
+}
+
+model Feedback {
+  id         Int       @id @default(autoincrement())
+  feedback   String?   @db.VarChar(255)
+  timestamp  DateTime? @map("timestamp")
+  studentId  Int       @map("Student_id")
+  advisorId  Int       @map("Advisor_id")
+  adminId    Int       @map("Admin_id")
+  student    Student   @relation(fields: [studentId], references: [id])
+  advisor    Advisor   @relation(fields: [advisorId], references: [id])
+  admin      Admin     @relation(fields: [adminId], references: [id])
+
+  @@map("feedback")
 }
