@@ -62,7 +62,7 @@ model Student {
   picture       String    @db.VarChar(45)
   departmentId  Int       @map("Department_id")
   degreeId      Int       @map("Degree_id")
-  advisorId     Int       @map("Advisor_id")
+  advisorId     Int?       @map("Advisor_id")
 
   department    Department @relation(fields: [departmentId], references: [id])
   degree        Degree     @relation(fields: [degreeId], references: [id])
