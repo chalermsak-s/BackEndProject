@@ -36,8 +36,8 @@ model Admin {
   userId    Int       @unique
   user      User      @relation(fields: [userId], references: [id])
   adminLogs AdminLog[]
-  appointments Appointment[]
-  feedbacks  Feedback[]
+  // appointments Appointment[]
+  // feedbacks  Feedback[]
 
   @@map("admin")
 }
@@ -62,11 +62,16 @@ model Student {
   picture       String    @db.VarChar(45)
   departmentId  Int       @map("Department_id")
   degreeId      Int       @map("Degree_id")
+  advisorId     Int       @map("Advisor_id")
+
   department    Department @relation(fields: [departmentId], references: [id])
   degree        Degree     @relation(fields: [degreeId], references: [id])
-  user         User        @relation(fields: [userId], references: [id])
-  appointments Appointment[]
-  feedbacks    Feedback[]
+  user          User       @relation(fields: [userId], references: [id])
+  advisor       Advisor?    @relation("StudentToAdvisor", fields: [advisorId], references: [id])
+
+  appointments      Appointment[]
+  sentFeedbacks     Feedback[]    @relation("SentFeedback")
+  receivedFeedbacks Feedback[] @relation("ReceivedFeedback")
 
   @@map("student")
 }
@@ -79,12 +84,16 @@ model Advisor {
   picture            String           @db.VarChar(45)
   academicPositionId Int              @map("Academic_position_id")
   departmentId       Int              @map("Department_id")
-  user              User              @relation(fields: [userId], references: [id])
+  
+  user               User             @relation(fields: [userId], references: [id])
   academicPosition   AcademicPosition @relation(fields: [academicPositionId], references: [id])
   department         Department       @relation(fields: [departmentId], references: [id])
+
+  students           Student[]        @relation("StudentToAdvisor")
   announcements      Announcement[]
   appointments       Appointment[]
-  feedbacks          Feedback[]
+  sentFeedbacks      Feedback[]       @relation("SentFeedback")
+  receivedFeedbacks  Feedback[]       @relation("ReceivedFeedback")
 
   @@map("advisor")
 }
@@ -121,15 +130,16 @@ model Appointment {
   description                String            @db.VarChar(255)
   requestedDate              DateTime          @map("requested_date")
   appointmentRequestDateTime DateTime          @map("appointment_request_date_time")
-  studentConfirmation        Int               @map("student_confirmation") @db.TinyInt
+  studentConfirmation        Boolean           @map("student_confirmation") @default(false)
   studentId                  Int               @map("Student_id")
   advisorId                  Int               @map("Advisor_id")
   statusAppointmentId        Int               @map("Status_appointment_id")
-  adminId                    Int               @map("Admin_id")
+  // adminId                    Int               @map("Admin_id")
+  
   student                    Student           @relation(fields: [studentId], references: [id])
   advisor                    Advisor           @relation(fields: [advisorId], references: [id])
   statusAppointment          StatusAppointment @relation(fields: [statusAppointmentId], references: [id])
-  admin                      Admin             @relation(fields: [adminId], references: [id])
+  // admin                      Admin             @relation(fields: [adminId], references: [id])
 
   @@map("appointment")
 }
@@ -147,7 +157,7 @@ model Announcement {
   topic       String   @db.VarChar(70)
   description String   @db.VarChar(225)
   file        String?  @db.VarChar(45)
-  postedDate  DateTime @map("posted_date")
+  postedDate  DateTime @map("posted_date") @default(now())
   advisorId   Int      @map("Advisor_id")
   advisor     Advisor  @relation(fields: [advisorId], references: [id])
 
@@ -155,15 +165,24 @@ model Announcement {
 }
 
 model Feedback {
-  id         Int       @id @default(autoincrement())
-  feedback   String?   @db.VarChar(255)
-  timestamp  DateTime? @map("timestamp")
-  studentId  Int       @map("Student_id")
-  advisorId  Int       @map("Advisor_id")
-  adminId    Int       @map("Admin_id")
-  student    Student   @relation(fields: [studentId], references: [id])
-  advisor    Advisor   @relation(fields: [advisorId], references: [id])
-  admin      Admin     @relation(fields: [adminId], references: [id])
+  id           Int       @id @default(autoincrement())
+  message      String    @db.VarChar(255)
+  timestamp    DateTime  @default(now())
+  isFromAdvisor Boolean  @map("is_from_advisor") @default(false)
+  
+  // Sender can be either student or advisor
+  senderId     Int       @map("sender_id")
+  senderType   String    @map("sender_type") @db.VarChar(10) // "STUDENT" or "ADVISOR"
+  
+  // Receiver can be either student or advisor
+  receiverId   Int       @map("receiver_id")
+  receiverType String    @map("receiver_type") @db.VarChar(10) // "STUDENT" or "ADVISOR"
+  
+  student      Student?  @relation("SentFeedback", fields: [senderId], references: [id], map: "FK_feedback_student_sender")
+  advisor      Advisor?  @relation("SentFeedback", fields: [senderId], references: [id], map: "FK_feedback_advisor_sender")
+  
+  studentReceiver Student? @relation("ReceivedFeedback", fields: [receiverId], references: [id], map: "FK_feedback_student_receiver")
+  advisorReceiver Advisor? @relation("ReceivedFeedback", fields: [receiverId], references: [id], map: "FK_feedback_advisor_receiver")
 
   @@map("feedback")
 }
