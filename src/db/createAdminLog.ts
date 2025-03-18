@@ -1,41 +1,71 @@
 import { PrismaClient } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
-// ข้อมูล admin logs จากการเชื่อมต่อนักศึกษากับอาจารย์ที่ปรึกษา
 export async function createAdminLog() {
-  // ข้อมูล admin logs จากการเชื่อมต่อนักศึกษากับอาจารย์ที่ปรึกษา
-  const adminLogs = [
-    // นักศึกษา ID 1-16 เชื่อมกับอาจารย์ที่ปรึกษา ตามภาควิชา
-    { action: "Connecting advisor with students", studentId: 1, advisorId: 1, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 2, advisorId: 2, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 3, advisorId: 3, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 4, advisorId: 4, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 5, advisorId: 5, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 6, advisorId: 6, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 7, advisorId: 9, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 8, advisorId: 1, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 9, advisorId: 2, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 10, advisorId: 3, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 11, advisorId: 4, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 12, advisorId: 5, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 13, advisorId: 6, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 14, advisorId: 7, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 15, advisorId: 8, adminId: 1 },
-    { action: "Connecting advisor with students", studentId: 16, advisorId: 9, adminId: 1 }
-  ];
-
-  console.log("เริ่มสร้างข้อมูล Admin Log...");
+  console.log("Creating admin logs...");
   
-  for (const log of adminLogs) {
-    await prisma.adminLog.create({
-      data: {
-        action: log.action,
-        studentId: log.studentId,
-        advisorId: log.advisorId,
-        adminId: log.adminId
+  try {
+    // ดึงข้อมูลผู้ดูแลระบบทั้งหมด
+    const admins = await prisma.admin.findMany({
+      include: {
+        user: true
       }
     });
+    
+    if (admins.length === 0) {
+      console.error("No admins found in the database. Please create admins first");
+      return;
+    }
+    
+    // สร้างบันทึกการทำงานสำหรับแต่ละ admin
+    for (const admin of admins) {
+      const logs = [
+        {
+          adminId: admin.id,
+          action: "เข้าสู่ระบบ",
+          date: "2025-06-01T10:00:00Z"
+        },
+        {
+          adminId: admin.id,
+          action: "สร้างข้อมูลอาจารย์",
+          date: "2025-06-03T11:00:00Z"
+        },
+        {
+          adminId: admin.id,
+          action: "กำหนดอาจารย์ที่ปรึกษาให้นักศึกษา",
+          date: "2025-06-05T11:11:00Z"
+        },
+        {
+          adminId: admin.id,
+          action: "แก้ไขข้อมูลนักศึกษา",
+          date: "2025-06-07T12:00:00Z"
+        },
+        {
+          adminId: admin.id,
+          action: "แก้ไขข้อมูลภาควิชา",
+          date: "2025-06-09T13:00:00Z"
+        },
+        {
+          adminId: admin.id,
+          action: "ดูรายงานสรุป",
+          date: "2025-06-11T14:00:00Z"
+        }
+      ];
+      
+      // สร้างบันทึกทีละรายการ
+      for (const log of logs) {
+        // สร้างบันทึก
+        await prisma.adminLog.create({
+          data: log
+        });
+        
+        console.log(`Created admin log: '${log.action}' for admin ID ${log.adminId}`);
+      }
+    }
+    
+    console.log("Admin logs creation completed");
+  } catch (error) {
+    console.error("Error creating admin logs:", error);
   }
-  
-  console.log(`สร้างข้อมูล Admin Log เสร็จสิ้น: ${adminLogs.length} รายการ`);
 }
