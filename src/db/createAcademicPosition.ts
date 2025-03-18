@@ -11,20 +11,16 @@ export async function createAcademicPositions() {
     { academicPositionName: "อาจารย์" }
   ];
 
-  console.log("เริ่มสร้างข้อมูลตำแหน่งทางวิชาการ...");
-
-  for (const position of academicPositions) {
-    try {
-      // สร้างตำแหน่งใหม่
-      const createdPosition = await prisma.academicPosition.create({
+  console.log("Creating academic positions...");
+  try {
+    for (const position of academicPositions) {
+      await prisma.academicPosition.create({
         data: position
       });
-
-      console.log(`สร้างตำแหน่ง ${createdPosition.academicPositionName} เรียบร้อยแล้ว`);
-    } catch (error) {
-      console.error(`เกิดข้อผิดพลาดในการสร้างตำแหน่ง ${position.academicPositionName}:`, error);
+      console.log(`Created academic position: ${position.academicPositionName}`);
     }
+    console.log("Academic positions creation completed");
+  } catch (error) {
+    console.error("Error creating academic positions:", error);
   }
-
-  console.log("สร้างข้อมูลตำแหน่งทางวิชาการเสร็จสิ้น");
 }

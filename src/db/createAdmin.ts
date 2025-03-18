@@ -10,12 +10,10 @@ export async function createAdmin() {
     username: "adminPhu",
     password: "adminPhu123"
   };
-
-  console.log("เริ่มสร้างข้อมูลผู้ดูแลระบบ...");
-  
   // เข้ารหัสรหัสผ่าน
   const hashedPassword = await bcrypt.hashSync(admin.password, numSaltAround);
-  
+
+  console.log("Creating admin data...");
   try {
     // สร้าง user พร้อมกับ admin ในคำสั่งเดียว
     const createdUser = await prisma.user.create({
@@ -32,10 +30,8 @@ export async function createAdmin() {
       }
     });
     
-    console.log(`สร้างข้อมูลผู้ดูแลระบบเสร็จสิ้น: ${createdUser.username}`);
-    return createdUser;
+    console.log(`Admin created: ${createdUser.username}`);
   } catch (error) {
-    console.error("เกิดข้อผิดพลาดในการสร้างผู้ดูแลระบบ:", error);
-    throw error;
+    console.error("Error creating admin!!!", error);
   }
 }

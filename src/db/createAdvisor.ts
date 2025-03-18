@@ -2,6 +2,7 @@ import { PrismaClient, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
+const numSaltAround = 10;
 
 // ข้อมูลอาจารย์ที่ปรึกษา
 export async function createAdvisors() {
@@ -35,34 +36,32 @@ export async function createAdvisors() {
     }
   ];
 
-  console.log("เริ่มสร้างข้อมูลอาจารย์ที่ปรึกษา...");
-
-  for (const advisor of advisors) {
-    try {
-      // ค้นหา academicPosition
+  try {
+    for (const advisor of advisors) {
+      // ค้นหาตำแหน่งทางวิชาการ
       const academicPosition = await prisma.academicPosition.findFirst({
         where: { academicPositionName: advisor.academicPositionName }
       });
-
+      
       if (!academicPosition) {
-        console.error(`ไม่พบตำแหน่งทางวิชาการ "${advisor.academicPositionName}" กรุณาสร้างตำแหน่งก่อน`);
+        console.error(`Academic position '${advisor.academicPositionName}' not found`);
         continue;
       }
-
-      // ค้นหา department
+      
+      // ค้นหาภาควิชา
       const department = await prisma.department.findFirst({
         where: { departmentName: advisor.departmentName }
       });
-
+      
       if (!department) {
-        console.error(`ไม่พบภาควิชา "${advisor.departmentName}" กรุณาสร้างภาควิชาก่อน`);
+        console.error(`Department '${advisor.departmentName}' not found`);
         continue;
       }
-
+      
       // เข้ารหัสรหัสผ่าน
-      const hashedPassword = await bcrypt.hash(advisor.password, 10);
-
-      // สร้างผู้ใช้และอาจารย์
+      const hashedPassword = await bcrypt.hashSync(advisor.password, numSaltAround);
+            
+      // สร้าง user และ advisor ในทีเดียว
       const createdUser = await prisma.user.create({
         data: {
           username: advisor.username,
@@ -79,20 +78,15 @@ export async function createAdvisors() {
           }
         },
         include: {
-          advisor: {
-            include: {
-              academicPosition: true,
-              department: true
-            }
-          }
+          advisor: true
         }
       });
-
-      console.log(`สร้างข้อมูลอาจารย์ ${createdUser.advisor?.firstName} ${createdUser.advisor?.lastName} เรียบร้อยแล้ว`);
-    } catch (error) {
-      console.error(`เกิดข้อผิดพลาดในการสร้างอาจารย์ ${advisor.firstName} ${advisor.lastName}:`, error);
+      
+      console.log(`Created advisor: ${advisor.firstName} ${advisor.lastName} (${advisor.username})`);
     }
+    
+    console.log("Advisors creation completed");
+  } catch (error) {
+    console.error("Error creating advisors:", error);
   }
-
-  console.log("สร้างข้อมูลอาจารย์ที่ปรึกษาเสร็จสิ้น");
 }

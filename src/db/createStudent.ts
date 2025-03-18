@@ -4,8 +4,9 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 const numSaltAround = 10;
 
-// ข้อมูลนักศึกษา
-export async function createStudents() {
+export async function createStudent() {
+  console.log("Creating students...");
+  
   const students = [
     {
       studentIdCard: "6309681001",
@@ -14,7 +15,8 @@ export async function createStudents() {
       lastName: "ใจดี",
       picture: "wichai.jpg",
       departmentName: "วิทยาการคอมพิวเตอร์",
-      degreeName: "ปริญญาตรี"
+      degreeName: "ปริญญาตรี",
+      advisorUsername: "somchai_s"
     },
     {
       studentIdCard: "6309681002",
@@ -23,7 +25,8 @@ export async function createStudents() {
       lastName: "ดีใจ",
       picture: "manee.jpg",
       departmentName: "เทคโนโลยีสารสนเทศ",
-      degreeName: "ปริญญาตรี"
+      degreeName: "ปริญญาตรี",
+      advisorUsername: "sompong_l"
     },
     {
       studentIdCard: "6309681003",
@@ -32,7 +35,8 @@ export async function createStudents() {
       lastName: "รักเรียน",
       picture: "sommai.jpg",
       departmentName: "วิทยาการข้อมูลและการวิเคราะห์เชิงธุรกิจ",
-      degreeName: "ปริญญาตรี"
+      degreeName: "ปริญญาตรี",
+      advisorUsername: "somsri_p"
     },
     {
       studentIdCard: "6309681004",
@@ -41,7 +45,8 @@ export async function createStudents() {
       lastName: "เก่งกล้า",
       picture: "somying.jpg",
       departmentName: "วิทยาการคอมพิวเตอร์",
-      degreeName: "ปริญญาตรี"
+      degreeName: "ปริญญาตรี",
+      advisorUsername: "somchai_s"
     },
     {
       studentIdCard: "6309681005",
@@ -50,47 +55,50 @@ export async function createStudents() {
       lastName: "มั่นคง",
       picture: "prasert.jpg",
       departmentName: "วิทยาการคอมพิวเตอร์",
-      degreeName: "ปริญญาตรี"
+      degreeName: "ปริญญาตรี",
+      advisorUsername: "somchai_s"
     }
   ];
-
-  console.log("เริ่มสร้างข้อมูลนักศึกษา...");
   
-  for (const student of students) {
-    try {
-      // ค้นหา department
+  try {
+    for (const student of students) {      
+      // ค้นหาภาควิชา
       const department = await prisma.department.findFirst({
         where: { departmentName: student.departmentName }
       });
-
+      
       if (!department) {
-        console.error(`ไม่พบภาควิชา "${student.departmentName}" กรุณาสร้างภาควิชาก่อน`);
+        console.error(`Department '${student.departmentName}' not found`);
         continue;
       }
-
-      // ค้นหา degree
+      
+      // ค้นหาระดับการศึกษา
       const degree = await prisma.degree.findFirst({
         where: { degreeName: student.degreeName }
       });
-
+      
       if (!degree) {
-        console.error(`ไม่พบระดับการศึกษา "${student.degreeName}" กรุณาสร้างระดับการศึกษาก่อน`);
+        console.error(`Degree '${student.degreeName}' not found`);
         continue;
       }
-
+      
+      // ค้นหาอาจารย์ที่ปรึกษา
+      const advisorUser = await prisma.user.findUnique({
+        where: { username: student.advisorUsername },
+        include: { advisor: true }
+      });
+      
+      let advisorId = null;
+      if (!advisorUser || !advisorUser.advisor) {
+        console.warn(`Advisor with username '${student.advisorUsername}' not found, student will be created without advisor`);
+      } else {
+        advisorId = advisorUser.advisor.id;
+      }
+      
       // เข้ารหัสรหัสผ่าน
       const hashedPassword = await bcrypt.hashSync(student.password, numSaltAround);
-  
-      // หาอาจารย์ในภาควิชาเดียวกัน (ตัวอย่างเท่านั้น)
-      const advisor = await prisma.advisor.findFirst({
-        where: { departmentId: department.id }
-      });
-
-      if (!advisor) {
-        console.warn(`ไม่พบอาจารย์ในภาควิชา "${student.departmentName}" จะสร้างนักศึกษาโดยไม่มีอาจารย์ที่ปรึกษา`);
-      }
-
-      // สร้างผู้ใช้และนักศึกษา
+            
+      // สร้าง user และ student ในทีเดียว
       const createdUser = await prisma.user.create({
         data: {
           username: student.studentIdCard,
@@ -104,36 +112,20 @@ export async function createStudents() {
               picture: student.picture,
               departmentId: department.id,
               degreeId: degree.id,
-              advisorId: advisor?.id // อาจเป็น null ถ้าไม่พบอาจารย์
+              advisorId: advisorId
             }
           }
         },
         include: {
-          student: {
-            include: {
-              department: true,
-              degree: true,
-              advisor: advisor ? {
-                include: {
-                  academicPosition: true
-                }
-              } : false
-            }
-          }
+          student: true
         }
       });
-
-      console.log(`สร้างข้อมูลนักศึกษา ${createdUser.student?.firstName} ${createdUser.student?.lastName} รหัส ${createdUser.student?.studentIdCard} เรียบร้อยแล้ว`);
       
-      if (advisor) {
-        console.log(`  อาจารย์ที่ปรึกษา: ${advisor.firstName} ${advisor.lastName}`);
-      } else {
-        console.log(`  ไม่มีอาจารย์ที่ปรึกษา`);
-      }
-    } catch (error) {
-      console.error(`เกิดข้อผิดพลาดในการสร้างนักศึกษา ${student.firstName} ${student.lastName}:`, error);
+      console.log(`Created student: ${student.firstName} ${student.lastName} (${student.studentIdCard})`);
     }
+    
+    console.log("Students creation completed");
+  } catch (error) {
+    console.error("Error creating students:", error);
   }
-
-  console.log("สร้างข้อมูลนักศึกษาเสร็จสิ้น");
 }
