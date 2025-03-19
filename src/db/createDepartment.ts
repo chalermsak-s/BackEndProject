@@ -1,8 +1,11 @@
+// Description: This script creates department data in the database using Prisma.
+// It includes departments such as "วิศวกรรมซอฟแวร์(หลักสูตรนานาชาติ)", "การจัดการสมัยใหม่และเทคโนโลยีสารสนเทศ", etc.
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// ข้อมูลภาควิชา
+// Create department data in the database
 export async function createDepartments() {
   const departments = [
     { initials: "SE(International Program)", departmentName: "วิศวกรรมซอฟแวร์(หลักสูตรนานาชาติ)" },
@@ -16,20 +19,14 @@ export async function createDepartments() {
     { initials: "DTM", departmentName: "การจัดการธุรกิจดิจิทัล" }
   ];
 
-  console.log("เริ่มสร้างข้อมูลภาควิชา...");
-
+  console.log("Creating departments...");
+  
   for (const department of departments) {
-    try {
-      // สร้างภาควิชาใหม่
-      const createdDepartment = await prisma.department.create({
-        data: department
-      });
-
-      console.log(`สร้างภาควิชา ${createdDepartment.departmentName} (${createdDepartment.initials}) เรียบร้อยแล้ว`);
-    } catch (error) {
-      console.error(`เกิดข้อผิดพลาดในการสร้างภาควิชา ${department.departmentName}:`, error);
-    }
+    const createdDepartment = await prisma.department.create({
+      data: department
+    });
+    console.log(`สร้างภาควิชา ${createdDepartment.departmentName} (${createdDepartment.initials}) เรียบร้อยแล้ว`);
   }
 
-  console.log("สร้างข้อมูลภาควิชาเสร็จสิ้น");
+  console.log("Departments creation completed");
 }

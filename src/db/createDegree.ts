@@ -1,7 +1,11 @@
+// Description: This script creates degree data in the database using Prisma.
+// It includes degree names such as "ปริญญาตรี", "ปริญญาโท", and "ปริญญาเอก".
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Create degree data in the database
 export async function createDegrees() {
   const degrees = [
     { degreeName: "ปริญญาตรี" },
@@ -9,19 +13,14 @@ export async function createDegrees() {
     { degreeName: "ปริญญาเอก" }
   ];
 
-  console.log("เริ่มสร้างข้อมูลระดับการศึกษา...");
+  console.log("Creating degrees...");
 
-  try {
-    for (const degree of degrees) {
-      await prisma.degree.create({
-        data: degree
-      });
-      
-      console.log(`Created degree: ${degree.degreeName}`);
-    }
-    
-    console.log("Degrees creation completed");
-  } catch (error) {
-    console.error("Error creating degrees:", error);
+  for (const degree of degrees) {
+    await prisma.degree.create({
+      data: degree
+    });
+    console.log(`Created degree: ${degree.degreeName}`);
   }
+  
+    console.log("Degrees creation completed");
 }

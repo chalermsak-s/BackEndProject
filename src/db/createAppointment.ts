@@ -1,7 +1,10 @@
+// Description: This script creates appointment data in the database using Prisma.
+// It includes appointment details such as topic, description, requested date, appointment request date/time, student confirmation status, student ID, advisor ID, and appointment status ID.
+
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// ข้อมูลการนัดหมาย
+// Create appointment data in the database
 export async function createAppointment() {
   const appointments = [
     {
@@ -96,27 +99,23 @@ export async function createAppointment() {
     },
   ];
 
-  console.log("เริ่มสร้างข้อมูลการนัดหมาย...");
+  console.log("Creating appointment data...");
   
-  try {
-    for (const appointment of appointments) {
-      await prisma.appointment.create({
-        data: {
-          topic: appointment.topic,
-          description: appointment.description,
-          requestedDate: appointment.requestedDate,
-          appointmentRequestDateTime: appointment.appointmentRequestDateTime,
-          studentConfirmation: appointment.studentConfirmation,
-          studentId: appointment.studentId,
-          advisorId: appointment.advisorId,
-          statusAppointmentId: appointment.statusAppointmentId,
-        }
-      });
-      console.log(`Created appointment : ${appointment.topic}`);
-    }
-  } catch (error) {
-    console.error("Error creating appointment data:", error);
-    return;
+  for (const appointment of appointments) {
+    await prisma.appointment.create({
+      data: {
+        topic: appointment.topic,
+        description: appointment.description,
+        requestedDate: appointment.requestedDate,
+        appointmentRequestDateTime: appointment.appointmentRequestDateTime,
+        studentConfirmation: appointment.studentConfirmation,
+        studentId: appointment.studentId,
+        advisorId: appointment.advisorId,
+        statusAppointmentId: appointment.statusAppointmentId,
+      }
+    });
+    console.log(`Created appointment : ${appointment.topic}`);
   }
+
   console.log("Created appointment data successfully");
 }

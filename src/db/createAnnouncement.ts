@@ -1,7 +1,11 @@
+// Description: Create announcement data in the database using Prisma.
+// This script creates announcements with various topics, descriptions, files, posted dates, and advisor IDs.
+// It also includes error handling for missing advisor IDs.
+
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// ข้อมูลประกาศ
+// Create announcement data in the database
 export async function createAnnouncement() {
   const announcements = [
     {
@@ -34,7 +38,7 @@ export async function createAnnouncement() {
     },
     {
       topic: "Media Critique Assignment",
-      description: "ออกแบบและสร้างแคมเปญสื่อที่มีเป้าหมายในการส่งเสริมความรู้หรือค่านิยมบางอย่างให้กับผู้ชม เช่น การทำแคมเปญโฆษณาสำหรับสินค้า หรือการสร้างการรับรู้ในประเด็นสังคมที่สำคัญ",
+      description: "ออกแบบและสร้างแคมเปญสื่อที่มีเป้าหมายในการส่งเสริมความรู้หรือค่านิยมบางอย่างให้กับผู้ชม",
       file: "jpg",
       postedDate: new Date("2025-06-18T16:59:56.000Z"),
       advisorId: 5
@@ -69,7 +73,7 @@ export async function createAnnouncement() {
     }
   ];
 
-  console.log("เริ่มสร้างข้อมูลประกาศ...");
+  console.log("Creating announcement data...");
   
   for (const announcement of announcements) {
     await prisma.announcement.create({
@@ -82,6 +86,5 @@ export async function createAnnouncement() {
       }
     });
   }
-  
-  console.log(`สร้างข้อมูลประกาศเสร็จสิ้น: ${announcements.length} รายการ`);
+  console.log("Announcement data creation completed");
 }

@@ -1,7 +1,10 @@
+// Description: Create status appointment data in the database using Prisma.
+// This script creates status appointment data such as "approved", "pending", "rejected", and "request is not successful".
+
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// ข้อมูลสถานะการนัดหมาย
+// Create status appointment data in the database
 export async function createStatusAppointment() {
   const statuses = [
     { status: "approved" },
@@ -10,7 +13,7 @@ export async function createStatusAppointment() {
     { status: "request is not successful" }
   ];
 
-  console.log("เริ่มสร้างข้อมูลสถานะการนัดหมาย...");
+  console.log("Creating status appointment data...");
   
   for (const status of statuses) {
     await prisma.statusAppointment.create({
@@ -20,5 +23,5 @@ export async function createStatusAppointment() {
     });
   }
   
-  console.log("สร้างข้อมูลสถานะการนัดหมายเสร็จสิ้น");
+  console.log("Status appointment data creation completed");
 }
