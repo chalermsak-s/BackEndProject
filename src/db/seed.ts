@@ -1,16 +1,17 @@
 import { PrismaClient } from '@prisma/client';
-import { createAcademicPosition } from './createAcademicPosition';
-import { createDepartment } from './createDepartment';
-import { createDegree } from './createDegree';
+import { createAcademicPositions } from './createAcademicPosition';
+import { createDepartments } from './createDepartment';
+import { createDegrees } from './createDegree';
 import { createStatusAppointment } from './createStatusAppointment';
 import { createResponder } from './createResponder';
 import { createAdmin } from './createAdmin';
-import { createAdvisor } from './createAdvisor';
+import { createAdvisors } from './createAdvisor';
 import { createStudent } from './createStudent';
 import { createAdminLog } from './createAdminLog';
 import { createAnnouncement } from './createAnnouncement';
 import { createAppointment } from './createAppointment';
 import { createFeedback } from './createFeedback';
+import { createUserRoles } from './createUserRole';
 
 const prisma = new PrismaClient();
 
@@ -19,15 +20,16 @@ export async function initDatabase() {
     console.log('เริ่มต้นการสร้างข้อมูลเริ่มต้น...');
     
     // สร้างข้อมูลพื้นฐาน (ตารางอ้างอิง)
-    await createAcademicPosition();
-    await createDepartment();
-    await createDegree();
+    await createUserRoles();
+    await createAcademicPositions();
+    await createDepartments();
+    await createDegrees();
     await createStatusAppointment();
     await createResponder();
     
     // สร้างข้อมูลผู้ใช้งาน
-    await createAdmin();
-    await createAdvisor();
+    await createAdmin({ username: 'admin', password: 'admin001', name: 'Administrator' });
+    await createAdvisors();
     await createStudent();
     
     // สร้างข้อมูลการดำเนินการและการทำงาน
@@ -42,12 +44,6 @@ export async function initDatabase() {
   } finally {
     await prisma.$disconnect();
   }
-}
-
-if (require.main === module) {
-  initDatabase()
-    .then(() => console.log('สคริปต์ทำงานเสร็จสิ้น'))
-    .catch((error) => console.error('เกิดข้อผิดพลาด:', error));
 }
 
 async function main() {

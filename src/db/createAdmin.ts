@@ -1,35 +1,38 @@
-// Description: Create an admin user in the database using Prisma.
-// This script creates an admin user with a hashed password and assigns the role of ADMIN.
-
-import { PrismaClient, UserRole } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcrypt";
+import { PrismaClient } from "@prisma/client";
+import { role } from '../../node_modules/.prisma/client/index.d';
 
 const prisma = new PrismaClient();
-const numSaltAround = 10;
 
-// Create an admin user in the database
-export async function createAdmin() {
-  const admin = {
-    username: "adminPhu",
-    password: "adminPhu123"
-  };
-  
-  const hashedPassword = await bcrypt.hashSync(admin.password, numSaltAround);
+export async function createAdmin(admin: { username: string; password: string; name:string }) {
+  const numSaltRounds = 10;
+  const hashedPassword = bcrypt.hashSync(admin.password, numSaltRounds);
 
   console.log("Creating admin data...");
-  
-  const createdUser = await prisma.user.create({
-    data: {
-      username: admin.username,
-      password: hashedPassword,
-      role: UserRole.ADMIN,
-      admin: {
-        create: {} // Create an empty admin object
-      }
-    },
-    include: {
-      admin: true
-    }
-  });
-  console.log(`Admin created: ${createdUser.username}`);
+  try {
+    //Create user and admin in one step
+    const createdUser = await prisma.user.create({
+      data: {
+        username: admin.username,
+        password: hashedPassword,
+        user_role: {
+          connect: {
+            role_name: "Admin", // Replace "Admin" with the actual role name or use an ID
+          },
+        },
+        admin: {
+          create: {
+            name: admin.name,
+          },
+        },
+      },
+      include: {
+        admin: true,
+      },
+    });
+
+    // console.log(`Admin created: ${createdUser.username}`);
+  } catch (error) {
+    console.error("Error creating admin:", error);
+  }
 }

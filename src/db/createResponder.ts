@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 // ประเภทผู้ตอบฟีดแบคมี 2 ประเภท ได้แก่ นักศึกษา และ อาจารย์ที่ปรึกษา
 export async function createResponder() {
   const responders = [
-    { id: 1, responder: "student" },
+    { id: 1, responder: "Student" },
     { id: 2, responder: "Advisor" }
   ];
 

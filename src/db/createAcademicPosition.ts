@@ -1,26 +1,26 @@
-// Description: This script creates academic positions in the database using Prisma.
-// It includes positions such as "ศาสตราจารย์", "รองศาสตราจารย์", "ผู้ช่วยศาสตราจารย์", and "อาจารย์".
-
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Create academic positions in the database
+// ข้อมูลตำแหน่งทางวิชาการ
 export async function createAcademicPositions() {
   const academicPositions = [
-    { academicPositionName: "ศาสตราจารย์" },
-    { academicPositionName: "รองศาสตราจารย์" },
-    { academicPositionName: "ผู้ช่วยศาสตราจารย์" },
-    { academicPositionName: "อาจารย์" }
+    { academic_position_name: "ศาสตราจารย์" },
+    { academic_position_name: "รองศาสตราจารย์" },
+    { academic_position_name: "ผู้ช่วยศาสตราจารย์" },
+    { academic_position_name: "อาจารย์" }
   ];
 
   console.log("Creating academic positions...");
-  
-  for (const position of academicPositions) {
-    await prisma.academicPosition.create({
-      data: position
-    });
-    console.log(`Created academic position: ${position.academicPositionName}`);
+  try {
+    for (const position of academicPositions) {
+      await prisma.academic_position.create({
+        data: position
+      });
+      console.log(`Created academic position: ${position.academic_position_name}`);
+    }
+    console.log("Academic positions creation completed");
+  } catch (error) {
+    console.error("Error creating academic positions:", error);
   }
-  console.log("Academic positions creation completed");
 }

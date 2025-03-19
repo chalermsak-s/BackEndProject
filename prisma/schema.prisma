@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,176 +7,160 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  STUDENT
-  ADVISOR
+enum role {
+  Admin
+  Student
+  Advisor
 }
 
-model User {
-  id       Int      @id @default(autoincrement())
-  username String   @unique @db.VarChar(65)
-  password String   @db.VarChar(45)
-  role     UserRole
-  admin    Admin?
-  student  Student?
-  advisor  Advisor?
-  
-  @@map("user")
+model user_role {
+  id        Int    @id @default(autoincrement())
+  role_name role   @unique
+  users     user[]
 }
 
-model Admin {
-  id        Int       @id @default(autoincrement())
-  userId    Int       @unique
-  user      User      @relation(fields: [userId], references: [id])
-  adminLogs AdminLog[]
-  // appointments Appointment[]
-  // feedbacks  Feedback[]
-
-  @@map("admin")
+model user {
+  id           Int        @id @default(autoincrement())
+  username     String     @unique @db.VarChar(150)
+  password     String     @db.VarChar(150)
+  admin_id     Int?
+  student_id   Int?
+  advisor_id   Int?
+  admin        admin?     @relation(fields: [admin_id], references: [id])
+  student      student?   @relation(fields: [student_id], references: [id])
+  advisor      advisor?   @relation(fields: [advisor_id], references: [id])
+  user_role    user_role? @relation(fields: [user_role_id], references: [id])
+  user_role_id Int?
 }
 
-model AdminLog {
-  id      Int      @id @default(autoincrement())
-  adminId Int
-  action  String   @db.VarChar(255)
-  date    DateTime @default(now())
-
-  admin   Admin    @relation(fields: [adminId], references: [id])
-
-  @@map("admin_log")
+model admin {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(45)
+  users       user[]
+  advisors    advisor[]
+  admin_log   admin_log[]
+  appointment appointment[]
+  feedback    feedback[]
 }
 
-model Student {
-  id            Int       @id @default(autoincrement())
-  userId        Int       @unique
-  studentIdCard String    @unique @map("student_id_card") @db.VarChar(15)
-  firstName     String    @map("first_name") @db.VarChar(45)
-  lastName      String    @map("last_name") @db.VarChar(45)
-  picture       String    @db.VarChar(45)
-  departmentId  Int       @map("Department_id")
-  degreeId      Int       @map("Degree_id")
-  advisorId     Int?       @map("Advisor_id")
-
-  department    Department @relation(fields: [departmentId], references: [id])
-  degree        Degree     @relation(fields: [degreeId], references: [id])
-  user          User       @relation(fields: [userId], references: [id])
-  advisor       Advisor?    @relation("StudentToAdvisor", fields: [advisorId], references: [id])
-
-  appointments      Appointment[]
-  sentFeedbacks     Feedback[]    @relation("SentFeedback")
-  receivedFeedbacks Feedback[] @relation("ReceivedFeedback")
-
-  @@map("student")
+model advisor {
+  id                   Int                @id @default(autoincrement())
+  first_name           String             @db.VarChar(45)
+  last_name            String             @db.VarChar(45)
+  picture              String?            @db.VarChar(45)
+  academic_position_id Int?
+  department_id        Int?
+  admin_id             Int?
+  academic_position    academic_position? @relation(fields: [academic_position_id], references: [id])
+  department           department?        @relation(fields: [department_id], references: [id])
+  admin                admin?             @relation(fields: [admin_id], references: [id])
+  users                user[]
+  announcements        announcement[]
+  appointments         appointment[]
+  feedbacks            feedback[]
+  admin_logs           admin_log[]
+  students             student[]
 }
 
-model Advisor {
-  id                 Int              @id @default(autoincrement())
-  userId             Int              @unique
-  firstName          String           @map("first_name") @db.VarChar(45)
-  lastName           String           @map("last_name") @db.VarChar(45)
-  picture            String           @db.VarChar(45)
-  academicPositionId Int              @map("Academic_position_id")
-  departmentId       Int              @map("Department_id")
-  
-  user               User             @relation(fields: [userId], references: [id])
-  academicPosition   AcademicPosition @relation(fields: [academicPositionId], references: [id])
-  department         Department       @relation(fields: [departmentId], references: [id])
-
-  students           Student[]        @relation("StudentToAdvisor")
-  announcements      Announcement[]
-  appointments       Appointment[]
-  sentFeedbacks      Feedback[]       @relation("SentFeedback")
-  receivedFeedbacks  Feedback[]       @relation("ReceivedFeedback")
-
-  @@map("advisor")
+model admin_log {
+  id         Int      @id @default(autoincrement())
+  action     String?  @db.VarChar(255)
+  log_date   DateTime @default(now())
+  student_id Int?
+  advisor_id Int?
+  admin_id   Int?
+  student    student? @relation(fields: [student_id], references: [id])
+  advisor    advisor? @relation(fields: [advisor_id], references: [id])
+  admin      admin?   @relation(fields: [admin_id], references: [id])
 }
 
-model AcademicPosition {
-  id                   Int       @id @default(autoincrement())
-  academicPositionName String    @map("academic_position_name") @db.VarChar(100)
-  advisors             Advisor[]
-
-  @@map("academic_position")
+model student {
+  id              Int           @id @default(autoincrement())
+  student_id_card String        @unique @db.VarChar(15)
+  first_name      String        @db.VarChar(45)
+  last_name       String        @db.VarChar(45)
+  picture         String?       @db.VarChar(45)
+  department_id   Int?
+  degree_id       Int?
+  advisor_id      Int?
+  department      department?   @relation(fields: [department_id], references: [id])
+  degree          degree?       @relation(fields: [degree_id], references: [id])
+  advisor         advisor?      @relation(fields: [advisor_id], references: [id])
+  users           user[]
+  appointments    appointment[]
+  feedbacks       feedback[]
+  admin_logs      admin_log[]
 }
 
-model Department {
-  id             Int       @id @default(autoincrement())
-  initials       String    @unique @db.VarChar(255)
-  departmentName String    @unique @map("department_name") @db.VarChar(255)
-  advisors       Advisor[]
-  students       Student[]
-
-  @@map("department")
+model degree {
+  id          Int       @id @default(autoincrement())
+  degree_name String    @db.VarChar(45)
+  students    student[]
 }
 
-model Degree {
-  id         Int       @id @default(autoincrement())
-  degreeName String    @map("degree_name") @db.VarChar(45)
-  students   Student[]
-
-  @@map("degree")
+model department {
+  id              Int       @id @default(autoincrement())
+  initials        String?   @db.VarChar(255)
+  department_name String    @db.VarChar(255)
+  students        student[]
+  advisors        advisor[]
 }
 
-model Appointment {
-  id                         Int               @id @default(autoincrement())
-  topic                      String            @db.VarChar(70)
-  description                String            @db.VarChar(255)
-  requestedDate              DateTime          @map("requested_date")
-  appointmentRequestDateTime DateTime          @map("appointment_request_date_time")
-  studentConfirmation        Boolean           @map("student_confirmation") @default(false)
-  studentId                  Int               @map("Student_id")
-  advisorId                  Int               @map("Advisor_id")
-  statusAppointmentId        Int               @map("Status_appointment_id")
-  // adminId                    Int               @map("Admin_id")
-  
-  student                    Student           @relation(fields: [studentId], references: [id])
-  advisor                    Advisor           @relation(fields: [advisorId], references: [id])
-  statusAppointment          StatusAppointment @relation(fields: [statusAppointmentId], references: [id])
-  // admin                      Admin             @relation(fields: [adminId], references: [id])
-
-  @@map("appointment")
+model academic_position {
+  id                     Int       @id @default(autoincrement())
+  academic_position_name String    @db.VarChar(100)
+  advisors               advisor[]
 }
 
-model StatusAppointment {
-  id           Int           @id @default(autoincrement())
-  status       String        @db.VarChar(45)
-  appointments Appointment[]
-
-  @@map("status_appointment")
-}
-
-model Announcement {
+model announcement {
   id          Int      @id @default(autoincrement())
   topic       String   @db.VarChar(70)
-  description String   @db.VarChar(225)
+  description String?  @db.VarChar(225)
   file        String?  @db.VarChar(45)
-  postedDate  DateTime @map("posted_date") @default(now())
-  advisorId   Int      @map("Advisor_id")
-  advisor     Advisor  @relation(fields: [advisorId], references: [id])
-
-  @@map("announcement")
+  posted_date DateTime @default(now())
+  advisor_id  Int?
+  advisor     advisor? @relation(fields: [advisor_id], references: [id])
 }
 
-model Feedback {
-  id           Int       @id @default(autoincrement())
-  message      String    @db.VarChar(255)
-  timestamp    DateTime  @default(now())
-  isFromAdvisor Boolean  @map("is_from_advisor") @default(false)
-  
-  // Sender can be either student or advisor
-  senderId     Int       @map("sender_id")
-  senderType   String    @map("sender_type") @db.VarChar(10) // "STUDENT" or "ADVISOR"
-  
-  // Receiver can be either student or advisor
-  receiverId   Int       @map("receiver_id")
-  receiverType String    @map("receiver_type") @db.VarChar(10) // "STUDENT" or "ADVISOR"
-  
-  student      Student?  @relation("SentFeedback", fields: [senderId], references: [id], map: "FK_feedback_student_sender")
-  advisor      Advisor?  @relation("SentFeedback", fields: [senderId], references: [id], map: "FK_feedback_advisor_sender")
-  
-  studentReceiver Student? @relation("ReceivedFeedback", fields: [receiverId], references: [id], map: "FK_feedback_student_receiver")
-  advisorReceiver Advisor? @relation("ReceivedFeedback", fields: [receiverId], references: [id], map: "FK_feedback_advisor_receiver")
+model appointment {
+  id                       Int                 @id @default(autoincrement())
+  topic                    String              @db.VarChar(70)
+  description              String?             @db.VarChar(255)
+  requested_date           DateTime
+  appointment_request_date DateTime
+  student_confirmation     Boolean             @default(false)
+  student_id               Int?
+  advisor_id               Int?
+  status_appointment_id    Int?
+  admin_id                 Int?
+  student                  student?            @relation(fields: [student_id], references: [id])
+  advisor                  advisor?            @relation(fields: [advisor_id], references: [id])
+  status                   status_appointment? @relation(fields: [status_appointment_id], references: [id])
+  admin                    admin?              @relation(fields: [admin_id], references: [id])
+}
 
-  @@map("feedback")
+model status_appointment {
+  id           Int           @id @default(autoincrement())
+  status       String        @db.VarChar(45)
+  appointments appointment[]
+}
+
+model feedback {
+  id           Int        @id @default(autoincrement())
+  feedback     String     @db.VarChar(255)
+  timestamp    DateTime   @default(now())
+  student_id   Int?
+  advisor_id   Int?
+  responder_id Int?
+  admin_id     Int?
+  student      student?   @relation(fields: [student_id], references: [id])
+  advisor      advisor?   @relation(fields: [advisor_id], references: [id])
+  responder    responder? @relation(fields: [responder_id], references: [id])
+  admin        admin?     @relation(fields: [admin_id], references: [id])
+}
+
+model responder {
+  id        Int        @id @default(autoincrement())
+  responder String     @db.VarChar(45)
+  feedbacks feedback[]
 }
