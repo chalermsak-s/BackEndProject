@@ -153,6 +153,9 @@ model feedback {
   advisor_id   Int?
   responder_id Int?
   admin_id     Int?
+  parent_feedback_id Int?
+  parent_feedback feedback? @relation("FeedbackReplies", fields: [parent_feedback_id], references: [id])
+  replies feedback[] @relation("FeedbackReplies")
   student      student?   @relation(fields: [student_id], references: [id])
   advisor      advisor?   @relation(fields: [advisor_id], references: [id])
   responder    responder? @relation(fields: [responder_id], references: [id])
