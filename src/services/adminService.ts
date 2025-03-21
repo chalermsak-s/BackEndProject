@@ -3,7 +3,7 @@
 
 import { AdminRepository, AdminLogRepository, CommonRepository } from '../repository';
 import { IAdmin } from '../models';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class AdminService extends BaseService {
   private adminRepository: AdminRepository;

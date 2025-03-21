@@ -5,11 +5,11 @@
 import express, { Request, Response } from 'express';
 import { StudentService } from '../services';
 import { AuthMiddleware } from '../middleware';
-import { uploadProfilePicture } from '../middleware/upload.middleware';
+import { uploadProfilePicture } from '../middleware/uploadMiddleware';
 import { ApiResponse } from '../utils/response.util';
 import { ROLES } from '../utils/constants';
 import { param, body } from 'express-validator';
-import { validate } from '../middleware/validation.middleware';
+import { validate } from '../middleware/validationMiddleware';
 
 const router = express.Router();
 const studentService = new StudentService();

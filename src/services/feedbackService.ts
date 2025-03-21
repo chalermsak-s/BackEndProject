@@ -4,7 +4,7 @@
 import { FeedbackRepository, StudentRepository } from '../repository';
 import { IFeedback } from '../models';
 import { RESPONDER_TYPE } from '../constants';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class FeedbackService extends BaseService {
   private feedbackRepository: FeedbackRepository;

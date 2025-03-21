@@ -1,14 +1,13 @@
 import express from 'express';
-
-import authRoutes from './auth.routes';
-import userRoutes from './user.routes';
-import studentRoutes from './student.routes';
-import advisorRoutes from './advisor.routes';
-import adminRoutes from './admin.routes';
-import feedbackRoutes from './feedback.routes';
-import announcementRoutes from './announcement.routes';
-import appointmentRoutes from './appointment.routes';
-import departmentRoutes from './department.routes';
+import authRoutes from './authRoutes';
+import userRoutes from './userRoutes';
+import studentRoutes from './studentRoutes';
+import advisorRoutes from './advisorRoutes';
+import adminRoutes from './adminRoutes';
+import feedbackRoutes from './feedbackRoutes';
+import announcementRoutes from './announcementRoutes';
+import appointmentRoutes from './appointmentRoutes';
+import departmentRoutes from './departmentRoutes';
 import { AuthMiddleware } from '../middleware';
 
 const router = express.Router();

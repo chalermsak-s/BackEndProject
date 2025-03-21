@@ -3,7 +3,7 @@
 
 import { AdvisorRepository, CommonRepository } from '../repository';
 import { IAdvisor } from '../models';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class AdvisorService extends BaseService {
   private advisorRepository: AdvisorRepository;

@@ -4,7 +4,7 @@
 import { AnnouncementRepository } from '../repository';
 import { IAnnouncement } from '../models';
 import { uploadFile } from './uploadFileService';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 import { announcement } from '@prisma/client';
 
 export class AnnouncementService extends BaseService {

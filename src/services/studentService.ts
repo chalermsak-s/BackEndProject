@@ -3,7 +3,7 @@
 
 import type { IStudent } from '../models';
 import { StudentRepository } from '../repository';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 import { uploadFile } from './uploadFileService';
 
 export class StudentService extends BaseService {
