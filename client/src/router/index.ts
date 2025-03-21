@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import nProgress from 'nprogress'
 import LoginView from '@/views/page/LoginView.vue'
 import AboutView from '@/views/page/AboutView.vue'
+import AdvisorView from '@/views/page/AdvisorView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,14 @@ const router = createRouter({
         path: "/about",
         name: "about-view",
         component: AboutView,
+        props: (route) => ({
+          page: parseInt(route.query.page as string) || 1,
+        }),
+      },
+      {
+        path: "/advisor",
+        name: "advisor-view",
+        component: AdvisorView,
         props: (route) => ({
           page: parseInt(route.query.page as string) || 1,
         }),
