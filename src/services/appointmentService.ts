@@ -4,7 +4,7 @@
 import { AppointmentRepository, StudentRepository } from '../repository';
 import { IAppointment } from '../models';
 import { APPOINTMENT_STATUS } from '../constants';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class AppointmentService extends BaseService {
   private appointmentRepository: AppointmentRepository;

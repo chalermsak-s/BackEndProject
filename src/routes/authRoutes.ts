@@ -4,7 +4,7 @@ import { AuthMiddleware } from '../middleware';
 import { ApiResponse } from '../utils/response.util';
 import { ROLES } from '../utils/constants';
 import { body } from 'express-validator';
-import { validate } from '../middleware/validation.middleware';
+import { validate } from '../middleware/validationMiddleware';
 import type { IRegisterRequest } from '../models';
 import prisma from '../repository/prisma-client';
 

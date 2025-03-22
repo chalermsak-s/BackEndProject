@@ -1,11 +1,11 @@
 // Description: UserService class that handles user-related operations
 // This class is responsible for assigning students to advisors and logging the actions performed by admins.
 
-import { StudentService } from './student.service';
-import { AdvisorService } from './advisor.service';
-import { AdminLogService } from './adminLog.service';
+import { StudentService } from './studentService';
+import { AdvisorService } from './advisorService';
+import { AdminLogService } from './adminLogService';
 import { CommonRepository } from '../repository';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class UserService extends BaseService {
   private studentService: StudentService;

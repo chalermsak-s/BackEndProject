@@ -2,7 +2,7 @@
 // It includes methods to get admin dashboard summaries and advisor statistics.
 
 import { AdminRepository } from '../repository';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class DashboardService extends BaseService {
   private adminRepository: AdminRepository;

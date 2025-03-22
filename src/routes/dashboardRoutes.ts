@@ -3,7 +3,7 @@ import { DashboardService } from '../services';
 import { AuthMiddleware } from '../middleware';
 import { ApiResponse } from '../utils/response.util';
 import { query } from 'express-validator';
-import { validate } from '../middleware/validation.middleware';
+import { validate } from '../middleware/validationMiddleware';
 
 const router = express.Router();
 const dashboardService = new DashboardService();

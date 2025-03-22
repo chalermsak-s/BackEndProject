@@ -2,7 +2,7 @@
 // It includes methods to create log entries for admin actions.
 
 import { AdminLogRepository } from '../repository';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class AdminLogService extends BaseService {
   private adminLogRepository: AdminLogRepository;

@@ -3,7 +3,7 @@
 
 import { DepartmentRepository } from '../repository';
 import { IDepartment, IDegree, IAcademicPosition } from '../models';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class DepartmentService extends BaseService {
   private departmentRepository: DepartmentRepository;

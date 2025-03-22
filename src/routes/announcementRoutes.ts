@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
 import { AnnouncementService } from '../services';
 import { AuthMiddleware } from '../middleware';
-import { uploadAnnouncementFile } from '../middleware/upload.middleware';
+import { uploadAnnouncementFile } from '../middleware/uploadMiddleware';
 import { ApiResponse } from '../utils/response.util';
 import { ROLES } from '../utils/constants';
 import { param, body } from 'express-validator';
-import { validate } from '../middleware/validation.middleware';
+import { validate } from '../middleware/validationMiddleware';
 import path from 'path';
 
 const router = express.Router();
