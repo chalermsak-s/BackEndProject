@@ -4,6 +4,7 @@ import LoginView from '@/views/page/LoginView.vue'
 import AboutView from '@/views/page/AboutView.vue'
 import AdvisorView from '@/views/page/AdvisorView.vue'
 import AdminView from '@/views/page/AdminView.vue'
+import StudentView from '@/views/page/StudentView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,6 +37,14 @@ const router = createRouter({
         path: "/admin",
         name: "admin-view",
         component: AdminView,
+        props: (route) => ({
+          page: parseInt(route.query.page as string) || 1,
+        }),
+      },
+      {
+        path: "/student",
+        name: "student-view",
+        component: StudentView,
         props: (route) => ({
           page: parseInt(route.query.page as string) || 1,
         }),
