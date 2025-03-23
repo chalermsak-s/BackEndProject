@@ -2,12 +2,12 @@
 // It includes methods to create, read, and retrieve feedback between students and advisors.
 
 import { Prisma } from '@prisma/client';
-import type { Feedback,FeedbackInsert } from '../models/feedback';
+import type { Feedback } from '../models/feedback';
 import prisma from './prisma-client';
 
 export class FeedbackRepository {
   // Create a new feedback
-  async createFeedback(feedbackData: FeedbackInsert): Promise<FeedbackInsert> {
+  async createFeedback(feedbackData: Feedback): Promise<Feedback> {
     try {
       return await prisma.feedback.create({
         data: feedbackData,
@@ -149,7 +149,7 @@ export class FeedbackRepository {
   }
 
   // Add a reply to an existing feedback
-  async addReply(replyData: Omit<Feedback, 'id'> & { parent_feedback_id: number }): Promise<Feedback> {
+  async addReply(replyData: Omit<Feedback, 'id'>): Promise<Feedback> {
     try {
       return await prisma.feedback.create({
         data: replyData,
@@ -161,7 +161,7 @@ export class FeedbackRepository {
         }
       });
     } catch (error) {
-      console.error(`Error adding reply to feedback ID ${replyData.parent_feedback_id}:`, error);
+      console.error('Error adding reply to feedback:', error);
       throw error;
     }
   }
