@@ -16,8 +16,8 @@ export interface Student {
   degree_id: number | null
   advisor_id: number | null
   advisor?: Advisor | null
-  department: Department | null
-  degree: Degree | null
+  department?: Department | null
+  degree?: Degree | null
   users?: User[]
   appointments?: Appointment[]
   feedbacks?: Feedback[]
