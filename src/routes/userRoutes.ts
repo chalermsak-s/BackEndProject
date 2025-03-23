@@ -3,8 +3,8 @@
 
 import express from 'express';
 
-import studentRoutes from './student.routes';
-import advisorRoutes from './advisor.routes';
+import studentRoutes from './studentRoutes';
+import advisorRoutes from './advisorRoutes';
 
 const router = express.Router();
 
