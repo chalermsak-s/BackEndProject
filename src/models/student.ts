@@ -4,6 +4,7 @@ import type { User } from './user'
 import type { Appointment } from './appointment'
 import type { Feedback } from './feedback'
 import type { AdminLog } from './adminLog'
+import type { Advisor } from './advisor'
 
 export interface Student {
   id: number
@@ -14,12 +15,13 @@ export interface Student {
   department_id: number | null
   degree_id: number | null
   advisor_id: number | null
+  advisor?: Advisor | null
   department: Department | null
   degree: Degree | null
-  users: User[]
-  appointments: Appointment[]
-  feedbacks: Feedback[]
-  admin_logs: AdminLog[]
+  users?: User[]
+  appointments?: Appointment[]
+  feedbacks?: Feedback[]
+  admin_logs?: AdminLog[]
 }
 
 export interface PageStudent {
@@ -33,8 +35,8 @@ export interface InStudent {
   student_id_card: string
   first_name: string
   last_name: string
-  picture: string
-  department_id: number
-  degree_id: number
-  advisor_id: number
+  picture?: string
+  department_id?: number
+  degree_id?: number
+  advisor_id?: number
 }

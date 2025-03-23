@@ -18,10 +18,10 @@ export interface Advisor {
   academic_position?: AcademicPosition
   department?: Department
   admin?: Admin
-  users: User[]
-  announcements: Announcement[]
-  appointments: Appointment[]
-  feedbacks: Feedback[]
-  admin_logs: AdminLog[]
-  students: Student[]
+  users?: User[]
+  announcements?: Announcement[]
+  appointments?: Appointment[]
+  feedbacks?: Feedback[]
+  admin_logs?: AdminLog[]
+  students?: Student[]
 }

@@ -6,9 +6,9 @@ import type { Feedback } from './feedback'
 export interface Admin {
   id: number;
   name: string;
-  users: User[];
-  advisors: Advisor[];
-  admin_log: AdminLog[];
-  appointment: Appointment[];
-  feedback: Feedback[];
+  users?: User[];
+  advisors?: Advisor[];
+  admin_log?: AdminLog[];
+  appointment?: Appointment[];
+  feedback?: Feedback[];
 }

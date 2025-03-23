@@ -10,6 +10,9 @@ export interface Feedback {
   advisor_id?: number
   responder_id?: number
   admin_id?: number
+  parent_feedback_id?: number
+  parent_feedback?: Feedback
+  replies?: Feedback[]
   student?: Student
   advisor?: Advisor
   responder?: Responder
