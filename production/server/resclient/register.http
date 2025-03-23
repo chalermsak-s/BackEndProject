@@ -1,0 +1,15 @@
+### Register
+POST http://localhost:3000/students HTTP/1.1
+content-type: application/json
+
+{
+    "username": "48404409",
+    "password": "48404409",
+    "student_id_card": "48404409",
+    "first_name": "Didy",
+    "last_name": "KumaA",
+    "picture": "48404409.jpg",
+    "department_id": 1,
+    "degree_id": 1,
+    "advisor_id": 1
+}

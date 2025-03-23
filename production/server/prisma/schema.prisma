@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum role {
+  Admin
+  Student
+  Advisor
+}
+
+model user_role {
+  id        Int    @id @default(autoincrement())
+  role_name role   @unique
+  users     user[]
+}
+
+model user {
+  id           Int        @id @default(autoincrement())
+  username     String     @unique @db.VarChar(150)
+  password     String     @db.VarChar(150)
+  admin_id     Int?
+  student_id   Int?
+  advisor_id   Int?
+  admin        admin?     @relation(fields: [admin_id], references: [id])
+  student      student?   @relation(fields: [student_id], references: [id])
+  advisor      advisor?   @relation(fields: [advisor_id], references: [id])
+  user_role    user_role? @relation(fields: [user_role_id], references: [id])
+  user_role_id Int?
+}
+
+model admin {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar(45)
+  users       user[]
+  advisors    advisor[]
+  admin_log   admin_log[]
+  appointment appointment[]
+  feedback    feedback[]
+}
+
+model advisor {
+  id                   Int                @id @default(autoincrement())
+  first_name           String             @db.VarChar(45)
+  last_name            String             @db.VarChar(45)
+  picture              String?            @db.VarChar(255)
+  academic_position_id Int?
+  department_id        Int?
+  admin_id             Int?
+  academic_position    academic_position? @relation(fields: [academic_position_id], references: [id])
+  department           department?        @relation(fields: [department_id], references: [id])
+  admin                admin?             @relation(fields: [admin_id], references: [id])
+  users                user[]
+  announcements        announcement[]
+  appointments         appointment[]
+  feedbacks            feedback[]
+  admin_logs           admin_log[]
+  students             student[]
+}
+
+model admin_log {
+  id         Int      @id @default(autoincrement())
+  action     String?  @db.VarChar(255)
+  log_date   DateTime @default(now())
+  student_id Int?
+  advisor_id Int?
+  admin_id   Int?
+  student    student? @relation(fields: [student_id], references: [id])
+  advisor    advisor? @relation(fields: [advisor_id], references: [id])
+  admin      admin?   @relation(fields: [admin_id], references: [id])
+}
+
+model student {
+  id              Int           @id @default(autoincrement())
+  student_id_card String        @unique @db.VarChar(15)
+  first_name      String        @db.VarChar(45)
+  last_name       String        @db.VarChar(45)
+  picture         String?       @db.VarChar(255)
+  department_id   Int?
+  degree_id       Int?
+  advisor_id      Int?
+  department      department?   @relation(fields: [department_id], references: [id])
+  degree          degree?       @relation(fields: [degree_id], references: [id])
+  advisor         advisor?      @relation(fields: [advisor_id], references: [id])
+  users           user[]
+  appointments    appointment[]
+  feedbacks       feedback[]
+  admin_logs      admin_log[]
+}
+
+model degree {
+  id          Int       @id @default(autoincrement())
+  degree_name String    @db.VarChar(45)
+  students    student[]
+}
+
+model department {
+  id              Int       @id @default(autoincrement())
+  initials        String?   @db.VarChar(255)
+  department_name String    @db.VarChar(255)
+  students        student[]
+  advisors        advisor[]
+}
+
+model academic_position {
+  id                     Int       @id @default(autoincrement())
+  academic_position_name String    @db.VarChar(100)
+  advisors               advisor[]
+}
+
+model announcement {
+  id          Int      @id @default(autoincrement())
+  topic       String   @db.VarChar(70)
+  description String?  @db.VarChar(225)
+  file        String?  @db.VarChar(255)
+  posted_date DateTime @default(now())
+  advisor_id  Int?
+  advisor     advisor? @relation(fields: [advisor_id], references: [id])
+}
+
+model appointment {
+  id                       Int                 @id @default(autoincrement())
+  topic                    String              @db.VarChar(70)
+  description              String?             @db.VarChar(255)
+  requested_date           DateTime
+  appointment_request_date DateTime
+  student_confirmation     Boolean             @default(false)
+  student_id               Int?
+  advisor_id               Int?
+  status_appointment_id    Int?
+  admin_id                 Int?
+  student                  student?            @relation(fields: [student_id], references: [id])
+  advisor                  advisor?            @relation(fields: [advisor_id], references: [id])
+  status                   status_appointment? @relation(fields: [status_appointment_id], references: [id])
+  admin                    admin?              @relation(fields: [admin_id], references: [id])
+}
+
+model status_appointment {
+  id           Int           @id @default(autoincrement())
+  status       String        @db.VarChar(45)
+  appointments appointment[]
+}
+
+model feedback {
+  id           Int        @id @default(autoincrement())
+  feedback     String     @db.VarChar(255)
+  timestamp    DateTime   @default(now())
+  student_id   Int?
+  advisor_id   Int?
+  responder_id Int?
+  admin_id     Int?
+  student      student?   @relation(fields: [student_id], references: [id])
+  advisor      advisor?   @relation(fields: [advisor_id], references: [id])
+  responder    responder? @relation(fields: [responder_id], references: [id])
+  admin        admin?     @relation(fields: [admin_id], references: [id])
+}
+
+model responder {
+  id        Int        @id @default(autoincrement())
+  responder String     @db.VarChar(45)
+  feedbacks feedback[]
+}

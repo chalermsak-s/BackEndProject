@@ -1,0 +1,72 @@
+### Show Me
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc0MjczNTAyOCwiZXhwIjoxNzQyNzM4NjI4fQ.ygbPXKJapeOLV9oDu72aaT12F5-p6KC536Ko3DQerfY
+
+@url1 = http://localhost:3000
+
+@url2 = http://localhost:3000
+
+@host = {{url1}}
+
+
+GET {{host}}/auth/me HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Check checkRole
+
+POST {{host}}/auth/checkRole HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Login Admin
+
+POST {{host}}/auth/authenticate HTTP/1.1
+content-type: application/json
+
+{
+    "username": "admin",
+    "password": "admin001"
+}
+
+### Login Student
+
+POST {{host}}/auth/authenticate HTTP/1.1
+content-type: application/json
+
+{
+    "username": "6309681001",
+    "password": "password123"
+}
+
+### Login Advisor
+
+POST {{host}}/auth/authenticate HTTP/1.1
+content-type: application/json
+
+{
+    "username": "somchai_s",
+    "password": "password123"
+}
+
+### Render
+
+POST https://lab5-s846.onrender.com/api/v1/auth/authenticate HTTP/1.1
+content-type: application/json
+
+{
+    "username":"user1@abc.com",
+    "password":"password1"
+}
+
+@token_reder = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc0MjQ2MDc3MywiZXhwIjoxNzQyNDc4NzczfQ.zUE4Y4BEftR5TEG4iQuBbOoIpUD8I0hem18pUVlP8oc
+
+### Render 
+GET https://lab5-s846.onrender.com/api/v1/auth/me HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{@token_reder}}
+
+
+### Example Post
+
+POST http://localhost:3000/test HTTP/1.1
+content-type: application/json

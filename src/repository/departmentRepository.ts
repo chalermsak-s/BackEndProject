@@ -1,6 +1,5 @@
 // Description: This file contains the DepartmentRepository class, which interacts with the database to manage department data.
 // It includes methods to get all departments, get a department by ID, get all degrees, get a degree by ID, and get all academic positions.
-
 import { Prisma } from '@prisma/client';
 import type { Department } from '../models/department';
 import type { Degree } from '../models/degree';
