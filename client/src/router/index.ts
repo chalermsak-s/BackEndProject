@@ -5,6 +5,7 @@ import AboutView from '@/views/page/AboutView.vue'
 import AdvisorView from '@/views/page/AdvisorView.vue'
 import AdminView from '@/views/page/AdminView.vue'
 import StudentView from '@/views/page/StudentView.vue'
+import DegreeView from '@/views/page/DegreeView.vue'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,14 @@ const router = createRouter({
         path: "/student",
         name: "student-view",
         component: StudentView,
+        props: (route) => ({
+          page: parseInt(route.query.page as string) || 1,
+        }),
+      },
+      {
+        path: "/degree",
+        name: "degree-view",
+        component: DegreeView,
         props: (route) => ({
           page: parseInt(route.query.page as string) || 1,
         }),
