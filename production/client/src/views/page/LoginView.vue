@@ -19,7 +19,9 @@ import * as zod from 'zod'
 
 // Define validation schema
 const loginSchema = zod.object({
-  username: zod.string().min(5, { message: 'กรุณากรอกชื่อผู้ใช้ 5 ตัว ขึ้นไป' }),
+  username: zod
+    .string()
+    .min(5, { message: 'กรุณากรอกชื่อผู้ใช้ 5 ตัว ขึ้นไป' }),
   password: zod.string().min(6, { message: 'กรุณากรอกรหัสผ่าน 5 ตัว ขึ้นไป' }),
 })
 
@@ -33,9 +35,9 @@ library.add(
   faUser
 )
 
-// const authStore = useAuthStore()
-// const messageStore = useMessageStore()
-// const router = useRouter()
+const authStore = useAuthStore()
+const messageStore = useMessageStore()
+const router = useRouter()
 
 // Initialize form with validation schema
 const { handleSubmit, errors } = useForm({
@@ -44,24 +46,65 @@ const { handleSubmit, errors } = useForm({
 
 const { value: username } = useField('username')
 const { value: password } = useField('password')
-
+import Swal from 'sweetalert2'
+const $swal = Swal
 // Handle form submission
-import apiClient from '@/services/AxiosClient'
 const onSubmit = handleSubmit(async (values) => {
   try {
-    //await authStore.login(values.username, values.password)
-    //router.push({ name: 'about-view' })
-    const response = await apiClient.post('/auth/authenticate', {
-        username: values.username,
-        password: values.password,
-      })
-      console.log(response.data)
+    await authStore.login(values.username, values.password)
+    if (authStore.isAdmin) {
+      $swal
+        .fire({
+          icon: 'success',
+          title: 'บันทึกข้อมูลสำเร็จ',
+          showConfirmButton: false,
+          timer: 1500,
+        })
+        .then(() => {
+          router.push({ name: 'admin-dashboard-view' })
+        })
+    }
+    if (authStore.isAdvisor) {
+      $swal
+        .fire({
+          icon: 'success',
+          title: 'บันทึกข้อมูลสำเร็จ',
+          showConfirmButton: false,
+          timer: 1500,
+        })
+        .then(() => {
+          router.push({ name: 'advisor-dashboard-view' })
+        })
+    }
+    if (authStore.isStudent) {
+      $swal
+        .fire({
+          icon: 'success',
+          title: 'เข้าสู่ระบบสำเร็จ',
+          showConfirmButton: false,
+          timer: 1500,
+        })
+        .then(() => {
+          router.push({ name: 'student-dashboard-view' })
+        })
+    }
   } catch (error) {
-    // messageStore.updateMessage('Could not login')
-    // setTimeout(() => {
-    //   messageStore.resetMessage()
-    // }, 3000)
-    alert('Fail');
+    messageStore.updateMessage('Could not login')
+    setTimeout(() => {
+      messageStore.resetMessage()
+    }, 3000)
+    $swal.fire({
+      icon: 'error',
+      title: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง',
+      text: 'กรุณาลองใหม่อีกครั้ง หรือตรวจสอบข้อมูลของคุณ',
+      showConfirmButton: false,
+      timer: 5000,
+      timerProgressBar: true,
+      backdrop: true,
+      showClass: {
+        popup: 'animate__animated animate__shakeX', // เพิ่มเอฟเฟกต์สั่นเมื่อผิดพลาด
+      },
+    })
   }
 })
 </script>
@@ -91,7 +134,7 @@ const onSubmit = handleSubmit(async (values) => {
               <font-awesome-icon :icon="['fas', 'user']" />
               <input
                 v-model="username"
-                type="number"
+                type="text"
                 class="grow text-base"
                 placeholder="Username"
                 autocomplete="off"

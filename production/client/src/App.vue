@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView} from 'vue-router'
+import { RouterLink, RouterView } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faCirclePlay,
@@ -11,26 +11,44 @@ import {
   faUsersBetweenLines,
   faUserTie,
   faCode,
+  faRightFromBracket,
 } from '@fortawesome/free-solid-svg-icons'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const details = ref<HTMLElement | null>(null);
+import { useAuthStore } from './stores/auth'
+import { useRouter } from 'vue-router'
+const authStore = useAuthStore()
+const router = useRouter()
 
-const closeDetails = (event:any) => {
+function logout() {
+  authStore.logout()
+  router.push({ name: 'login-view' })
+}
+const token = localStorage.getItem('token')
+const user = localStorage.getItem('user')
+if (token && user) {
+  authStore.reload(token, JSON.parse(user))
+} else {
+  authStore.logout()
+}
+
+const details = ref<HTMLElement | null>(null)
+
+const closeDetails = (event: any) => {
   if (details.value && !details.value.contains(event.target)) {
-    details.value.removeAttribute('open');
+    details.value.removeAttribute('open')
   }
-};
+}
 
 onMounted(() => {
-  document.addEventListener('click', closeDetails);
-});
+  document.addEventListener('click', closeDetails)
+})
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeDetails);
-});
+  document.removeEventListener('click', closeDetails)
+})
 
 // เพิ่มเฉพาะไอคอนที่ใช้ในหน้านี้
 library.add(
@@ -43,7 +61,8 @@ library.add(
   faUsersBetweenLines,
   faUserTie,
   faCode,
-  faGithub
+  faGithub,
+  faRightFromBracket
 )
 </script>
 
@@ -53,11 +72,7 @@ library.add(
       <div class="navbar-start">
         <div class="dropdown">
           <!-- ปุ่มเปิดเมนู -->
-          <div
-            tabindex="0"
-            role="button"
-            class="btn btn-ghost lg:hidden"
-          >
+          <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               class="h-5 w-5"
@@ -85,21 +100,15 @@ library.add(
               </RouterLink>
             </li>
             <li>
-              <a>
-                <font-awesome-icon :icon="['fas', 'file']" /> รายชื่อ
-              </a>
+              <a> <font-awesome-icon :icon="['fas', 'file']" /> รายชื่อ </a>
               <ul class="p-2">
                 <li>
-                  <RouterLink
-                    :to="{ name: 'advisor-list-view' }"
-                  >
+                  <RouterLink :to="{ name: 'advisor-list-view' }">
                     <font-awesome-icon :icon="['fas', 'user-tie']" /> อาจารย์
                   </RouterLink>
                 </li>
                 <li>
-                  <RouterLink
-                    :to="{ name: 'student-list-view' }"
-                  >
+                  <RouterLink :to="{ name: 'student-list-view' }">
                     <font-awesome-icon :icon="['fas', 'users-between-lines']" />
                     นักศึกษา
                   </RouterLink>
@@ -157,16 +166,30 @@ library.add(
       </div>
       <div class="navbar-end">
         <RouterLink
+          v-if="!authStore.token"
           :to="{ name: 'register-view' }"
           class="btn btn-primary mr-0.5"
         >
           <font-awesome-icon :icon="['fas', 'user-plus']" />
           <span class="hidden sm:block">ลงทะเบียน</span>
         </RouterLink>
-        <RouterLink :to="{ name: 'login-view' }" class="btn btn-neutral ml-0.5">
+        <RouterLink
+          v-if="!authStore.token"
+          :to="{ name: 'login-view' }"
+          class="btn btn-neutral ml-0.5"
+        >
           <font-awesome-icon :icon="['fas', 'right-to-bracket']" />
           <span class="hidden sm:block">เข้าสู่ระบบ</span>
         </RouterLink>
+
+        <button
+          v-if="authStore.token"
+          @click="logout"
+          class="btn btn-dark ml-0.5"
+        >
+          <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
+          <span class="hidden sm:block">ออกจากระบบ</span>
+        </button>
       </div>
     </div>
   </header>

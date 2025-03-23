@@ -28,6 +28,7 @@ export async function registerAdmin(
 ) {
   
   // Create the user with associated roles
+
   return prisma.user.create({
     data: {
       username: username,
