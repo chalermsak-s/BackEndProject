@@ -1,13 +1,13 @@
 // Description: This file contains the FeedbackRepository class, which interacts with the database to manage feedback data.
 // It includes methods to create, read, and retrieve feedback between students and advisors.
 
-import { feedback } from '@prisma/client';
-import type { IFeedback } from '../models';
+import { Prisma } from '@prisma/client';
+import type { Feedback } from '../models/feedback';
 import prisma from './prisma-client';
 
 export class FeedbackRepository {
   // Create a new feedback
-  async createFeedback(feedbackData: IFeedback): Promise<feedback> {
+  async createFeedback(feedbackData: Feedback): Promise<Feedback> {
     try {
       return await prisma.feedback.create({
         data: feedbackData,
@@ -19,7 +19,7 @@ export class FeedbackRepository {
   }
 
   // Get feedback by ID
-  async getFeedbackById(id: number): Promise<feedback | null> {
+  async getFeedbackById(id: number): Promise<Feedback | null> {
     try {
       return await prisma.feedback.findUnique({
         where: { id },
@@ -39,7 +39,7 @@ export class FeedbackRepository {
   }
 
   // Get feedback conversation between student and advisor
-  async getFeedbackConversation(studentId: number, advisorId: number): Promise<feedback[]> {
+  async getFeedbackConversation(studentId: number, advisorId: number): Promise<Feedback[]> {
     try {
       return await prisma.feedback.findMany({
         where: {
@@ -73,7 +73,7 @@ export class FeedbackRepository {
   }
 
   // Get Advisor feedbacks 
-  async getAdvisorFeedbacks(advisorId: number): Promise<feedback[]> {
+  async getAdvisorFeedbacks(advisorId: number): Promise<Feedback[]> {
     try {
       return await prisma.feedback.findMany({
         where: {
@@ -111,7 +111,7 @@ export class FeedbackRepository {
   }
 
   // Get Student feedbacks
-  async getStudentFeedbacks(studentId: number): Promise<feedback[]> {
+  async getStudentFeedbacks(studentId: number): Promise<Feedback[]> {
     try {
       return await prisma.feedback.findMany({
         where: {
@@ -149,7 +149,7 @@ export class FeedbackRepository {
   }
 
   // Add a reply to an existing feedback
-  async addReply(replyData: Omit<IFeedback, 'id'>): Promise<feedback> {
+  async addReply(replyData: Omit<Feedback, 'id' | 'parent_feedback_id'>): Promise<Feedback> {
     try {
       return await prisma.feedback.create({
         data: replyData,
@@ -161,13 +161,13 @@ export class FeedbackRepository {
         }
       });
     } catch (error) {
-      console.error(`Error adding reply to feedback ID ${replyData.parent_feedback_id}:`, error);
+      console.error('Error adding reply to feedback:', error);
       throw error;
     }
   }
 
   // Get all replies to a feedback
-  async getFeedbackReplies(feedbackId: number): Promise<feedback[]> {
+  async getFeedbackReplies(feedbackId: number): Promise<Feedback[]> {
     try {
       return await prisma.feedback.findMany({
         where: {
