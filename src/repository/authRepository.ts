@@ -1,13 +1,15 @@
 // Description: This file contains the AuthRepository class, which interacts with the database for authentication operations.
 // It includes methods for user registration, login verification, and password management.
 
-import { user } from "@prisma/client";
-import { IStudent, IAdvisor } from "../models";
+import { Prisma } from "@prisma/client";
+import { User} from "../models/user";
+import { Student} from "../models/student";
+import { Advisor } from "../models/advisor";
 import prisma from './prisma-client';
 
 export class AuthRepository {
   // Find user by username
-  async findByUsername(username: string): Promise<user | null> {
+  async findByUsername(username: string): Promise<User | null> {
     try {
       return await prisma.user.findUnique({
         where: {
@@ -24,7 +26,7 @@ export class AuthRepository {
   }
 
   // Find user by ID
-  async findByUserId(userId: number): Promise<user | null> {
+  async findByUserId(userId: number): Promise<User | null> {
     try {
       return await prisma.user.findUnique({
         where: {
@@ -41,7 +43,7 @@ export class AuthRepository {
   }
 
   // Register a new user
-  async registerUser(username: string, password: string, roleId: number): Promise<user> {
+  async registerUser(username: string, password: string, roleId: number): Promise<User> {
     try {
       // Create the user with associated role
       return await prisma.user.create({
@@ -61,7 +63,7 @@ export class AuthRepository {
   }
 
   // Update user password
-  async updatePassword(userId: number, password: string): Promise<user> {
+  async updatePassword(userId: number, password: string): Promise<User> {
     try {
       return await prisma.user.update({
         where: {
@@ -78,7 +80,7 @@ export class AuthRepository {
   }
 
   // Register a student
-  async registerStudent(studentData: IStudent, password: string): Promise<any> {
+  async registerStudent(studentData: Student, password: string): Promise<any> {
     try {
       // Check if student with this ID card already exists
       const existingStudent = await prisma.student.findUnique({
@@ -99,7 +101,7 @@ export class AuthRepository {
       }
       
       // Use transaction to ensure data consistency
-      return await prisma.$transaction(async (tx) => {
+      return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         // Create student record
         const student = await tx.student.create({
           data: studentData
@@ -132,10 +134,10 @@ export class AuthRepository {
   }
 
   // Admin creates advisor account
-  async createAdvisorAccount(advisorData: IAdvisor, username: string, password: string): Promise<any> {
+  async createAdvisorAccount(advisorData: Advisor, username: string, password: string): Promise<any> {
     try {
       // Use transaction to ensure data consistency
-      return await prisma.$transaction(async (tx) => {
+      return await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         // Create advisor record
         const advisor = await tx.advisor.create({
           data: advisorData

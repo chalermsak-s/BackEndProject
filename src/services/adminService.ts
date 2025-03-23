@@ -2,7 +2,7 @@
 // It includes methods for admin dashboard data, advisor management, and student management.
 
 import { AdminRepository, AdminLogRepository, CommonRepository } from '../repository';
-import { IAdmin } from '../models';
+import { Admin } from '../models/admin';
 import { BaseService } from './baseService';
 
 export class AdminService extends BaseService {
@@ -18,7 +18,7 @@ export class AdminService extends BaseService {
   }
 
   // Create a new admin
-  async createAdmin(adminData: IAdmin): Promise<any> {
+  async createAdmin(adminData: Admin): Promise<any> {
     try {
       return await this.adminRepository.createAdmin(adminData);
     } catch (error) {

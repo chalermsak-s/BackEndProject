@@ -1,7 +1,7 @@
 // Description: This file contains the StudentService class, which provides methods to manage student data.
 // It includes methods to get all students, search for students, get a student by ID, update a student, and delete a student.
 
-import type { IStudent } from '../models';
+import type { Student } from '../models/student';
 import { StudentRepository } from '../repository';
 import { BaseService } from './baseService';
 import { uploadFile } from './uploadFileService';
@@ -46,7 +46,7 @@ export class StudentService extends BaseService {
   }
 
   // Create a new student
-  async createStudent(data: IStudent) {
+  async createStudent(data: Student) {
     try {
       return await this.studentRepository.createStudent(data);
     } catch (error) {
@@ -70,7 +70,7 @@ export class StudentService extends BaseService {
   }
 
   // Update student information
-  async updateStudent(studentId: number, data: Partial<IStudent>) {
+  async updateStudent(studentId: number, data: Partial<Student>) {
     try {
       return await this.studentRepository.updateStudent(studentId, data);
     } catch (error) {

@@ -2,13 +2,13 @@
 // It includes methods to create, read, update, and delete announcements.
 // It also includes methods to get announcements by advisor ID, student ID, and to get all announcements.
 
-import { announcement } from '@prisma/client';
-import type { IAnnouncement } from '../models';
+import { Prisma } from '@prisma/client';
+import type { Announcement, AnnouncementInsert } from '../models/announcement';
 import prisma from './prisma-client';
 
 export class AnnouncementRepository {
   // Create a new announcement
-  async createAnnouncement(announcementData: IAnnouncement): Promise<announcement> {
+  async createAnnouncement(announcementData: AnnouncementInsert): Promise<AnnouncementInsert> {
     try {
       return await prisma.announcement.create({
         data: announcementData
@@ -20,7 +20,7 @@ export class AnnouncementRepository {
   }
 
   // Get all announcements
-  async getAllAnnouncements(): Promise<announcement[]> {
+  async getAllAnnouncements(): Promise<Announcement[]> {
     try {
       return await prisma.announcement.findMany({
         include: {
@@ -41,7 +41,7 @@ export class AnnouncementRepository {
   }
 
   // Get announcement by ID
-  async getAnnouncementById(id: number): Promise<announcement | null> {
+  async getAnnouncementById(id: number): Promise<Announcement | null> {
     try {
       return await prisma.announcement.findUnique({
         where: { id },
@@ -60,7 +60,7 @@ export class AnnouncementRepository {
   }
 
   // Get all announcements by advisor ID
-  async getAnnouncementsByAdvisorId(advisorId: number): Promise<announcement[]> {
+  async getAnnouncementsByAdvisorId(advisorId: number): Promise<Announcement[]> {
     try {
       return await prisma.announcement.findMany({
         where: { advisor_id: advisorId },
@@ -82,7 +82,7 @@ export class AnnouncementRepository {
   }
 
   // Get all announcements for a student
-  async getAllAnnouncementsForStudent(studentId: number): Promise<announcement[]> {
+  async getAllAnnouncementsForStudent(studentId: number): Promise<Announcement[]> {
     try {
       // Get the student's advisor ID
       const student = await prisma.student.findUnique({
@@ -133,7 +133,7 @@ export class AnnouncementRepository {
   }
 
   // Upload announcement file
-  async uploadAnnouncementFile(id: number, filePath: string): Promise<announcement> {
+  async uploadAnnouncementFile(id: number, filePath: string): Promise<Announcement> {
     try {
       return await prisma.announcement.update({
         where: { id },

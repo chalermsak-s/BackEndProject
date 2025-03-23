@@ -2,14 +2,14 @@
 // This file contains methods to create, read, update, and delete student records.
 // It also includes methods to search for students by various criteria and to get all students with their related data.
 
-import { student } from '@prisma/client';
-import type { IStudent } from '../models';
+import { Prisma } from '@prisma/client';
+import type { Student } from '../models/student';
 import prisma from './prisma-client';
 
 export class StudentRepository {
   
   // Create a new student
-  async createStudent(studentData: IStudent): Promise<student> {
+  async createStudent(studentData: Student): Promise<Student> {
     try {
       return await prisma.student.create({ data: studentData });
     } catch (error) {
@@ -19,7 +19,7 @@ export class StudentRepository {
   }
 
   // Get student by user ID
-  async getStudentByUserId(userId: number): Promise<student | null> {
+  async getStudentByUserId(userId: number): Promise<Student | null> {
     try {
       return await prisma.student.findFirst({ 
         where: { users: { some: { id: userId } } } 
@@ -31,7 +31,7 @@ export class StudentRepository {
   }
 
   // Get student by student ID card
-  async getStudentByIdCard(studentIdCard: string): Promise<student | null> {
+  async getStudentByIdCard(studentIdCard: string): Promise<Student | null> {
     try {
       return await prisma.student.findUnique({ where: { student_id_card: studentIdCard } });
     } catch (error) {
@@ -41,7 +41,7 @@ export class StudentRepository {
   }
 
   // Get student by ID
-  async getStudentById(id: number): Promise<student | null> {
+  async getStudentById(id: number): Promise<Student | null> {
     try {
       return await prisma.student.findUnique({ where: { id } });
     } catch (error) {
@@ -51,7 +51,7 @@ export class StudentRepository {
   }
 
   // Get all students with related data
-  async getAllStudents(): Promise<student[]> {
+  async getAllStudents(): Promise<Student[]> {
     try {
       return await prisma.student.findMany({
         include: {
@@ -67,7 +67,7 @@ export class StudentRepository {
   }
 
   // Search students by name or ID
-  async searchStudents(query: string): Promise<student[]> {
+  async searchStudents(query: string): Promise<Student[]> {
     try {
       return await prisma.student.findMany({
         where: {
@@ -90,7 +90,7 @@ export class StudentRepository {
   }
 
   // Update student information
-  async updateStudent(student_id: number, data: Partial<IStudent>): Promise<student> {
+  async updateStudent(student_id: number, data: Partial<Student>): Promise<Student> {
     try {
       return await prisma.student.update({ where: { id: student_id }, data });
     } catch (error) {
@@ -100,7 +100,7 @@ export class StudentRepository {
   }
 
   // Update student profile picture
-  async updateProfilePicture(studentId: number, picturePath: string): Promise<student> {
+  async updateProfilePicture(studentId: number, picturePath: string): Promise<Student> {
     try {
       return await prisma.student.update({
         where: { id: studentId },
@@ -116,7 +116,7 @@ export class StudentRepository {
   async deleteStudent(student_id: number): Promise<void> {
     try {
       // Use transaction to ensure data consistency when deleting related records
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.appointment.deleteMany({ where: { student_id: student_id } });
         await tx.feedback.deleteMany({
           where: { student_id: student_id }

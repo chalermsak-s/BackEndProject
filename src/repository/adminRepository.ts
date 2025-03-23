@@ -1,13 +1,13 @@
 // Description: This file contains the AdminRepository class, which interacts with the database for admin operations.
 // It includes methods for admin creation, dashboard data retrieval, and user management functions.
 
-import { admin } from '@prisma/client';
-import type { IAdmin } from '../models';
+import type { Admin } from '../models/admin';
+import type { StatusAppointment } from '../models/statusAppointment';
 import prisma from './prisma-client';
 
 export class AdminRepository {
   // Create a new admin
-  async createAdmin(adminData: IAdmin): Promise<admin> {
+  async createAdmin(adminData: Admin): Promise<Admin> {
     try {
       return await prisma.admin.create({ data: adminData });
     } catch (error) {
@@ -17,7 +17,7 @@ export class AdminRepository {
   }
 
   // Get admin by ID
-  async getAdminById(id: number): Promise<admin | null> {
+  async getAdminById(id: number): Promise<Admin | null> {
     try {
       return await prisma.admin.findUnique({ where: { id } });
     } catch (error) {
@@ -66,7 +66,7 @@ export class AdminRepository {
       
       // For each status, count the number of appointments
       const statusCounts = await Promise.all(
-        statuses.map(async (status) => {
+        statuses.map(async (status: StatusAppointment) => {
           const count = await prisma.appointment.count({
             where: {
               status_appointment_id: status.id

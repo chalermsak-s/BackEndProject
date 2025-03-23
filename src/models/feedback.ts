@@ -15,3 +15,16 @@ export interface Feedback {
   responder?: Responder
   admin?: Admin
 }
+
+export interface FeedbackInsert {
+  feedback: string
+  timestamp: Date
+  student_id?: number
+  advisor_id?: number
+  responder_id?: number
+  admin_id?: number
+  student?: Student
+  advisor?: Advisor
+  responder?: Responder
+  admin?: Admin
+}

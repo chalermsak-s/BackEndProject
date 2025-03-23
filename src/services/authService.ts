@@ -4,9 +4,10 @@
 import { AuthRepository, StudentRepository, AdvisorRepository } from '../repository';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import type { IStudent, IAdvisor } from '../models';
+import type { Student } from '../models/student';
+import type { Advisor } from '../models/advisor';
 import { USER_ROLE } from '../constants';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 export class AuthService extends BaseService {
   private authRepository: AuthRepository;
@@ -90,7 +91,7 @@ export class AuthService extends BaseService {
   }
 
   // Register a new student
-  async registerStudent(studentData: IStudent, password: string) {
+  async registerStudent(studentData: Student, password: string) {
     try {
       // Use the repository's transaction to handle this operation
       return await this.authRepository.registerStudent(studentData, bcrypt.hashSync(password));
@@ -100,7 +101,7 @@ export class AuthService extends BaseService {
   }
 
   // Register a new advisor
-  async registerAdvisor(advisorData: IAdvisor, username: string, password: string, adminId: number) {
+  async registerAdvisor(advisorData: Advisor, username: string, password: string, adminId: number) {
     try {
       // Use the repository's transaction to handle this operation
       return await this.authRepository.createAdvisorAccount(

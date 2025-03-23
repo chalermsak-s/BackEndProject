@@ -1,7 +1,8 @@
 // Description: This file contains the AdminLogRepository class, which interacts with the database to manage admin logs.
 // It includes methods to create logs and retrieve logs by admin ID, student ID, or advisor ID.
 
-import { admin_log } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import type { AdminLog } from '../models/adminLog';
 import prisma from './prisma-client';
 
 export class AdminLogRepository {
@@ -11,7 +12,7 @@ export class AdminLogRepository {
     adminId?: number, 
     studentId?: number, 
     advisorId?: number
-  ): Promise<admin_log> {
+  ): Promise<AdminLog> {
     try {
       return await prisma.admin_log.create({
         data: {
@@ -28,7 +29,7 @@ export class AdminLogRepository {
   }
 
   // Get logs by admin ID
-  async getLogsByAdminId(adminId: number): Promise<admin_log[]> {
+  async getLogsByAdminId(adminId: number): Promise<AdminLog[]> {
     try {
       return await prisma.admin_log.findMany({
         where: { admin_id: adminId },
@@ -48,7 +49,7 @@ export class AdminLogRepository {
   }
 
   // Get logs by student ID
-  async getLogsByStudentId(studentId: number): Promise<admin_log[]> {
+  async getLogsByStudentId(studentId: number): Promise<AdminLog[]> {
     try {
       return await prisma.admin_log.findMany({
         where: { student_id: studentId },
@@ -68,7 +69,7 @@ export class AdminLogRepository {
   }
 
   // Get logs by advisor ID
-  async getLogsByAdvisorId(advisorId: number): Promise<admin_log[]> {
+  async getLogsByAdvisorId(advisorId: number): Promise<AdminLog[]> {
     try {
       return await prisma.admin_log.findMany({
         where: { advisor_id: advisorId },

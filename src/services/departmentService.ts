@@ -2,7 +2,9 @@
 // It includes methods to get all departments, degrees, and academic positions, and to get them by ID.
 
 import { DepartmentRepository } from '../repository';
-import { IDepartment, IDegree, IAcademicPosition } from '../models';
+import { Department} from '../models/department';
+import { Degree } from '../models/degree';
+import { AcademicPosition } from '../models/academicPosition';
 import { BaseService } from './baseService';
 
 export class DepartmentService extends BaseService {

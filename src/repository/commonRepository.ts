@@ -28,7 +28,13 @@ export class CommonRepository {
       });
       
       // Transform to match the expected output format
-      return result.map(advisor => ({
+      return result.map((advisor: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        academic_position?: { academic_position_name: string };
+        _count: { students: number };
+      }) => ({
         id: advisor.id,
         first_name: advisor.first_name,
         last_name: advisor.last_name,

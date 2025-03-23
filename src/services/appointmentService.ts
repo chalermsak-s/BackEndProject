@@ -2,7 +2,7 @@
 // It includes methods to create, read, update, and manage appointments between students and advisors.
 
 import { AppointmentRepository, StudentRepository } from '../repository';
-import { IAppointment } from '../models';
+import { Appointment } from '../models/appointment';
 import { APPOINTMENT_STATUS } from '../constants';
 import { BaseService } from './baseService';
 

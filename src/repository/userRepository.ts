@@ -2,14 +2,15 @@
 // This file contains methods to create, read, update, and delete user and admin records.
 // It also includes methods to search for users by various criteria and to get all users with their related data.
 
-import { user, admin } from '@prisma/client';
-import type { IUser, IAdmin } from '../models';
+import { Prisma } from '@prisma/client';
+import type { User} from '../models/user';
+import type { Admin } from '../models/admin';
 import prisma from './prisma-client';
 
 export class UserRepository {
 
   // Create a new user
-  async createUser(userData: IUser): Promise<user> {
+  async createUser(userData: User): Promise<User> {
     try {
       return await prisma.user.create({ data: userData });
     } catch (error) {
@@ -19,7 +20,7 @@ export class UserRepository {
   }
 
   // Get user by ID
-  async getUserById(id: number): Promise<user | null> {
+  async getUserById(id: number): Promise<User | null> {
     try {
       return await prisma.user.findUnique({ where: { id } });
     } catch (error) {
@@ -29,7 +30,7 @@ export class UserRepository {
   }
 
   // Get user by username
-  async getUserByUsername(username: string): Promise<user | null> {
+  async getUserByUsername(username: string): Promise<User | null> {
     try {
       return await prisma.user.findUnique({ where: { username } });
     } catch (error) {
@@ -39,7 +40,7 @@ export class UserRepository {
   }
 
   // Create a new admin
-  async createAdmin(adminData: IAdmin): Promise<admin> {
+  async createAdmin(adminData: Admin): Promise<Admin> {
     try {
       return await prisma.admin.create({ data: adminData });
     } catch (error) {
@@ -49,7 +50,7 @@ export class UserRepository {
   }
 
   // Get admin by user ID
-  async getAdminByUserId(userId: number): Promise<admin | null> {
+  async getAdminByUserId(userId: number): Promise<Admin | null> {
     try {
       return await prisma.admin.findFirst({ where: { users: { some: { id: userId } } } });
     } catch (error) {

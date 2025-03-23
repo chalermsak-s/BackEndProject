@@ -2,10 +2,11 @@
 // It includes methods to create, read, and delete announcements.
 
 import { AnnouncementRepository } from '../repository';
-import { IAnnouncement } from '../models';
+import { Announcement,AnnouncementInsert } from '../models/announcement';
 import { uploadFile } from './uploadFileService';
 import { BaseService } from './baseService';
-import { announcement } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import prisma from '@prisma/client';
 
 export class AnnouncementService extends BaseService {
   private announcementRepository: AnnouncementRepository;
@@ -25,7 +26,7 @@ export class AnnouncementService extends BaseService {
     topic: string, 
     description: string, 
     file?: Express.Multer.File
-  ): Promise<announcement> {
+  ): Promise<AnnouncementInsert> {
     try {
       let fileUrl: string | undefined = undefined;
       
@@ -35,7 +36,7 @@ export class AnnouncementService extends BaseService {
       }
       
       // Create the announcement data
-      const announcementData: IAnnouncement = {
+      const announcementData: AnnouncementInsert = {
         topic,
         description,
         file: fileUrl,

@@ -1,10 +1,8 @@
-// Description: This file contains the FeedbackService class for managing feedback between students and advisors.
-// It includes methods to create, read, and retrieve feedback communications.
-
 import { FeedbackRepository, StudentRepository } from '../repository';
-import { IFeedback } from '../models';
+import { Feedback } from '../models/feedback';
 import { RESPONDER_TYPE } from '../constants';
 import { BaseService } from './baseService';
+import prisma from '../repository/prisma-client';
 
 export class FeedbackService extends BaseService {
   private feedbackRepository: FeedbackRepository;
@@ -19,19 +17,17 @@ export class FeedbackService extends BaseService {
   // Create feedback from advisor to student
   async createAdvisorFeedback(advisorId: number, studentId: number, message: string) {
     try {
-      // Validate that the advisor is assigned to this student
       const student = await this.studentRepository.getStudentById(studentId);
-      
       if (!student || student.advisor_id !== advisorId) {
         throw new Error('Advisor is not assigned to this student');
       }
-      
+
       return await this.feedbackRepository.createFeedback({
         feedback: message,
         timestamp: new Date(),
         student_id: studentId,
         advisor_id: advisorId,
-        responder_id: RESPONDER_TYPE.ADVISOR  // Using constant from constants file
+        responder_id: RESPONDER_TYPE.ADVISOR
       });
     } catch (error) {
       return this.handleError(error, 'Error creating advisor feedback');
@@ -41,19 +37,17 @@ export class FeedbackService extends BaseService {
   // Create feedback from student to advisor
   async createStudentFeedback(studentId: number, advisorId: number, message: string) {
     try {
-      // Validate that the student is assigned to this advisor
       const student = await this.studentRepository.getStudentById(studentId);
-      
       if (!student || student.advisor_id !== advisorId) {
         throw new Error('Student is not assigned to this advisor');
       }
-      
+
       return await this.feedbackRepository.createFeedback({
         feedback: message,
         timestamp: new Date(),
         student_id: studentId,
         advisor_id: advisorId,
-        responder_id: RESPONDER_TYPE.STUDENT  // Using constant from constants file
+        responder_id: RESPONDER_TYPE.STUDENT
       });
     } catch (error) {
       return this.handleError(error, 'Error creating student feedback');
@@ -86,36 +80,41 @@ export class FeedbackService extends BaseService {
       return this.handleError(error, `Error retrieving feedbacks for student ID ${studentId}`);
     }
   }
-  
+
   // Add a reply to a feedback
   async addReply(parentFeedbackId: number, senderId: number, responderType: number, message: string) {
     try {
       const parentFeedback = await this.feedbackRepository.getFeedbackById(parentFeedbackId);
-      
       if (!parentFeedback) {
         throw new Error('Parent feedback not found');
       }
-      
-      // ตรวจสอบและแปลงค่า null เป็น undefined เพื่อให้ตรงกับ type Omit<IFeedback, "id">
-      const student_id = parentFeedback.student_id === null ? undefined : parentFeedback.student_id;
-      const advisor_id = parentFeedback.advisor_id === null ? undefined : parentFeedback.advisor_id;
-      
-      if (!student_id || !advisor_id) {
+
+      const student_id = parentFeedback.student_id ?? undefined;
+      const advisor_id = parentFeedback.advisor_id ?? undefined;
+
+      if (student_id === undefined || advisor_id === undefined) {
         throw new Error('Invalid parent feedback: missing student or advisor ID');
       }
-      
-      const replyData = {
+
+      return await this.feedbackRepository.addReply({
         feedback: message,
         timestamp: new Date(),
-        student_id: student_id,
-        advisor_id: advisor_id,
+        student_id,
+        advisor_id,
         responder_id: responderType,
         parent_feedback_id: parentFeedbackId
-      };
-      
-      return await this.feedbackRepository.addReply(replyData);
+      });
     } catch (error) {
       return this.handleError(error, `Error adding reply to feedback ID ${parentFeedbackId}`);
+    }
+  }
+
+  // General feedback creation
+  async createFeedback(feedbackData: Omit<Feedback, 'id'>): Promise<Feedback> {
+    try {
+      return await prisma.feedback.create({ data: feedbackData });
+    } catch (error) {
+      return this.handleError(error, 'Error creating feedback');
     }
   }
 }

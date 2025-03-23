@@ -4,7 +4,7 @@
 import s3Client from '../awsConfig';
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { randomBytes } from 'crypto';
-import { BaseService } from './base.service';
+import { BaseService } from './baseService';
 
 function generateSaltedFilename(originalName: string): string {
   const salt = randomBytes(16).toString('hex');

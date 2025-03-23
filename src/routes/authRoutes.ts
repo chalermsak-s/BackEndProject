@@ -5,7 +5,7 @@ import { ApiResponse } from '../utils/response.util';
 import { ROLES } from '../utils/constants';
 import { body } from 'express-validator';
 import { validate } from '../middleware/validationMiddleware';
-import type { IRegisterRequest } from '../models';
+import type { RegisterRequest } from '../models/registerRequest';
 import prisma from '../repository/prisma-client';
 
 
@@ -77,11 +77,11 @@ router.post('/register',
   ],
   validate,
   async (req: Request, res: Response) => {
-    const registerRequest: IRegisterRequest = req.body;
+    const registerRequest: RegisterRequest = req.body;
     
     try {
-      const { username, password, roleId } = registerRequest;
-      const responseUser = await authService.registerUser(username, password, roleId);
+      const { username, password, user_role_id } = registerRequest;
+      const responseUser = await authService.registerUser(username, password, user_role_id);
       
       const responseUserRoleData = await prisma.user_role.findUnique({
         where: { id: responseUser.user_role_id || 0 }

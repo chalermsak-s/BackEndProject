@@ -2,14 +2,14 @@
 // It includes methods to create, read, update, and delete advisor records.
 // It also includes methods to search for advisors by various criteria and to get all advisors with their related data.
 
-import { advisor } from '@prisma/client';
-import type { IAdvisor } from '../models';
+import { Prisma } from '@prisma/client';
+import type { Advisor } from '../models/advisor';
 import prisma from './prisma-client';
 
 export class AdvisorRepository {
 
   // Create a new advisor
-  async createAdvisor(advisorData: IAdvisor): Promise<advisor> {
+  async createAdvisor(advisorData: Advisor): Promise<Advisor> {
     try {
       return await prisma.advisor.create({ data: advisorData });
     } catch (error) {
@@ -19,7 +19,7 @@ export class AdvisorRepository {
   }
 
   // Get advisor by user ID
-  async getAdvisorByUserId(userId: number): Promise<advisor | null> {
+  async getAdvisorByUserId(userId: number): Promise<Advisor | null> {
     try {
       return await prisma.advisor.findFirst({ 
         where: { users: { some: { id: userId } } }
@@ -31,7 +31,7 @@ export class AdvisorRepository {
   }
 
   // Get advisor by ID
-  async getAdvisorById(id: number): Promise<advisor | null> {
+  async getAdvisorById(id: number): Promise<Advisor | null> {
     try {
       return await prisma.advisor.findUnique({
         where: { id },
@@ -47,7 +47,7 @@ export class AdvisorRepository {
   }
 
   // Get all advisors with related data
-  async getAllAdvisors(): Promise<advisor[]> {
+  async getAllAdvisors(): Promise<Advisor[]> {
     try {
       return await prisma.advisor.findMany({
         include: {
@@ -62,7 +62,7 @@ export class AdvisorRepository {
   }
 
   // Search advisors by name or ID
-  async searchAdvisors(query: string): Promise<advisor[]> {
+  async searchAdvisors(query: string): Promise<Advisor[]> {
     try {
       return await prisma.advisor.findMany({
         where: {
@@ -91,7 +91,7 @@ export class AdvisorRepository {
   }
 
   // Update advisor information
-  async updateAdvisor(advisorId: number, data: Partial<IAdvisor>): Promise<advisor> {
+  async updateAdvisor(advisorId: number, data: Partial<Advisor>): Promise<Advisor> {
     try {
       return await prisma.advisor.update({ where: { id: advisorId }, data });
     } catch (error) {
@@ -101,7 +101,7 @@ export class AdvisorRepository {
   }
 
   // Update advisor's profile picture
-  async updateProfilePicture(advisorId: number, picturePath: string): Promise<advisor> {
+  async updateProfilePicture(advisorId: number, picturePath: string): Promise<Advisor> {
     try {
       return await prisma.advisor.update({
         where: { id: advisorId },
@@ -117,7 +117,7 @@ export class AdvisorRepository {
   async deleteAdvisor(advisorId: number): Promise<void> {
     try {
       // Use transaction to ensure data consistency when deleting related records
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const students = await tx.student.findMany({ where: { advisor_id: advisorId } });
 
         if (students.length > 0) {

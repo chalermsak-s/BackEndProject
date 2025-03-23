@@ -2,13 +2,14 @@
 // It includes methods to create, read, update, and delete appointments.
 // It also includes methods to get appointments by student ID, advisor ID, and to get all appointments.
 
-import { appointment, status_appointment, Prisma } from '@prisma/client';
-import type { IAppointment, IStatusAppointment } from '../models';
+import { Prisma } from '@prisma/client';
+import type { Appointment } from '../models/appointment';
+import type { StatusAppointment } from '../models/statusAppointment';
 import prisma from './prisma-client';
 
 export class AppointmentRepository {
   // Create a new appointment
-  async createAppointment(appointmentData: IAppointment): Promise<appointment> {
+  async createAppointment(appointmentData: Appointment): Promise<Appointment> {
     try {
       return await prisma.appointment.create({
         data: appointmentData
@@ -20,7 +21,7 @@ export class AppointmentRepository {
   }
 
   // Get appointment by ID
-  async getAppointmentById(id: number): Promise<appointment | null> {
+  async getAppointmentById(id: number): Promise<Appointment | null> {
     try {
       return await prisma.appointment.findUnique({
         where: { id },
@@ -41,7 +42,7 @@ export class AppointmentRepository {
   }
 
   // Get all appointments by student ID
-  async getAppointmentsByStudentId(studentId: number): Promise<appointment[]> {
+  async getAppointmentsByStudentId(studentId: number): Promise<Appointment[]> {
     try {
       return await prisma.appointment.findMany({
         where: { student_id: studentId },
@@ -64,7 +65,7 @@ export class AppointmentRepository {
   }
 
   // Get all appointments for an advisor
-  async getAppointmentsByAdvisorId(advisorId: number): Promise<appointment[]> {
+  async getAppointmentsByAdvisorId(advisorId: number): Promise<Appointment[]> {
     try {
       return await prisma.appointment.findMany({
         where: { advisor_id: advisorId },
@@ -83,7 +84,7 @@ export class AppointmentRepository {
   }
 
   // Update appointment
-  async updateAppointment(id: number, appointmentData: Partial<IAppointment>): Promise<appointment> {
+  async updateAppointment(id: number, appointmentData: Partial<Appointment>): Promise<Appointment> {
     try {
       return await prisma.appointment.update({
         where: { id },
@@ -96,7 +97,7 @@ export class AppointmentRepository {
   }
 
   // Get all status appointments
-  async getAllStatusAppointments(): Promise<status_appointment[]> {
+  async getAllStatusAppointments(): Promise<StatusAppointment[]> {
     try {
       return await prisma.status_appointment.findMany();
     } catch (error) {
@@ -131,7 +132,7 @@ export class AppointmentRepository {
       });
       
       // Transform the data to the desired output format
-      return statuses.map(status => {
+      return statuses.map((status: { status: string; appointments: any[] }) => {
         return {
           status: status.status,
           count: status.appointments.length,
@@ -149,7 +150,7 @@ export class AppointmentRepository {
   }
 
   // Student requests an appointment
-  async requestAppointment(appointmentData: Omit<IAppointment, 'id' | 'student_confirmation'>): Promise<appointment> {
+  async requestAppointment(appointmentData: Omit<Appointment, 'id' | 'student_confirmation'>): Promise<Appointment> {
     try {
       return await prisma.appointment.create({
         data: {
@@ -170,7 +171,7 @@ export class AppointmentRepository {
   }
 
   // Advisor sets appointment date
-  async setAppointmentDate(id: number, requestedDate: Date): Promise<appointment> {
+  async setAppointmentDate(id: number, requestedDate: Date): Promise<Appointment> {
     try {
       return await prisma.appointment.update({
         where: { id },
@@ -191,7 +192,7 @@ export class AppointmentRepository {
   }
 
   // Student confirms appointment
-  async confirmAppointment(id: number): Promise<appointment> {
+  async confirmAppointment(id: number): Promise<Appointment> {
     try {
       const appointment = await prisma.appointment.findUnique({
         where: { id },

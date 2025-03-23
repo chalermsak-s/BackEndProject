@@ -2,7 +2,7 @@
 // It includes methods to get all advisors, search for advisors, get an advisor by ID, update an advisor, and delete an advisor.
 
 import { AdvisorRepository, CommonRepository } from '../repository';
-import { IAdvisor } from '../models';
+import { Advisor } from '../models/advisor';
 import { BaseService } from './baseService';
 
 export class AdvisorService extends BaseService {
@@ -43,7 +43,7 @@ export class AdvisorService extends BaseService {
   }
 
   // Update advisor information
-  async updateAdvisor(advisorId: number, data: Partial<IAdvisor>) {
+  async updateAdvisor(advisorId: number, data: Partial<Advisor>) {
     try {
       return await this.advisorRepository.updateAdvisor(advisorId, data);
     } catch (error) {
