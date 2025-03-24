@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fancyapps/ui": "^5.0.36",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
@@ -20,6 +21,7 @@
     "@tailwindcss/vite": "^4.0.14",
     "@vee-validate/yup": "^4.15.0",
     "@vee-validate/zod": "^4.15.0",
+    "@vueuse/core": "^13.0.0",
     "axios": "^1.8.2",
     "daisyui": "^5.0.4",
     "nprogress": "^0.2.0",

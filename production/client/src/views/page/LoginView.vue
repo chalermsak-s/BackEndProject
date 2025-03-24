@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { watchEffect } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
+import Swal from 'sweetalert2'
 import {
   faCirclePlay,
   faRightToBracket,
@@ -46,8 +48,29 @@ const { handleSubmit, errors } = useForm({
 
 const { value: username } = useField('username')
 const { value: password } = useField('password')
-import Swal from 'sweetalert2'
+
 const $swal = Swal
+
+
+/* Check redirect Role start*/
+watchEffect(() => {
+  const userAuthen = localStorage.getItem('user')
+  const userDataLogin = userAuthen ? JSON.parse(userAuthen) : null
+
+  if (userDataLogin?.user_role?.role_name) {
+    const roleName = String(userDataLogin.user_role.role_name)
+    const routes = {
+      Admin: 'admin-dashboard-view',
+      Advisor: 'advisor-dashboard-view',
+      Student: 'student-dashboard-view',
+    }
+    router.push({ name: routes[roleName as keyof typeof routes] || 'login-view' })
+  } else {
+    router.push({ name: 'login-view' })
+  }
+})
+/* Check redirect Role end*/
+
 // Handle form submission
 const onSubmit = handleSubmit(async (values) => {
   try {
@@ -56,7 +79,7 @@ const onSubmit = handleSubmit(async (values) => {
       $swal
         .fire({
           icon: 'success',
-          title: 'บันทึกข้อมูลสำเร็จ',
+          title: 'เข้าสู่ระบบสำเร็จ',
           showConfirmButton: false,
           timer: 1500,
         })
@@ -68,7 +91,7 @@ const onSubmit = handleSubmit(async (values) => {
       $swal
         .fire({
           icon: 'success',
-          title: 'บันทึกข้อมูลสำเร็จ',
+          title: 'เข้าสู่ระบบสำเร็จ',
           showConfirmButton: false,
           timer: 1500,
         })

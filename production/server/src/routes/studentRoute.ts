@@ -49,11 +49,11 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id)
-  const event = await studentService.getStudentById(id)
-  if (event) {
-    res.json(event)
+  const student = await studentService.getStudentById(id)
+  if (student) {
+    res.json(student)
   } else {
-    res.status(404).send('Event not found')
+    res.status(404).send('Student not found')
   }
 })
 

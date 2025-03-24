@@ -6,6 +6,9 @@ import authRoutes from './routes/authRoutes'
 import advisorRoutes from './routes/advisorRoutes'
 import departmentRoutes from './routes/departmentRoutes'
 import degreeRoutes from './routes/degreeRoutes'
+import appointmentRoutes from './routes/appointmentRoutes'
+import announcementRoutes from './routes/announcementRoutes'
+import feedbackRoutes from './routes/feedbackRoutes'
 
 const port = process.env.PORT || 3000
 dotenv.config()
@@ -19,6 +22,9 @@ app.use('/auth', authRoutes)
 app.use('/advisors', advisorRoutes)
 app.use('/departments', departmentRoutes)
 app.use('/degrees', degreeRoutes)
+app.use('/appointments', appointmentRoutes)
+app.use('/announcements', announcementRoutes)
+app.use('/feedbacks', feedbackRoutes)
 
 app.get('/', (req: Request, res: Response) => {
   res.json({

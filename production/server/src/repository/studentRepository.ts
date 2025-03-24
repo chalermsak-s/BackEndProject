@@ -10,6 +10,7 @@ export function getAllStudents() {
       student_id_card: true,
       first_name: true,
       last_name: true,
+      picture: true,
       department: true,
       degree: true,
       users: {
@@ -35,6 +36,7 @@ export function getStudentById(id: number) {
       student_id_card: true,
       first_name: true,
       last_name: true,
+      picture: true,
       department: true,
       degree: true,
       users: {

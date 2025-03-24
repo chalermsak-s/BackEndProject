@@ -1,18 +1,18 @@
 import express, { Request, Response } from 'express'
-import * as advisorService from '../services/advisorService'
+import * as feedbackService from '../services/feedbackService'
 const router = express.Router()
 
 router.get('/', async (req: Request, res: Response) => {
-    res.json(await advisorService.getAllAdvisors())
+    res.json(await feedbackService.getAllFeedbacks())
 })
 
 router.get('/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id)
-    const advisor = await advisorService.getAdvisorById(id)
-    if (advisor) {
-      res.json(advisor)
+    const feedback = await feedbackService.getFeedbackById(id)
+    if (feedback) {
+      res.json(feedback)
     } else {
-      res.status(404).send('Advisor not found')
+      res.status(404).send('Feedback not found')
     }
 })
 

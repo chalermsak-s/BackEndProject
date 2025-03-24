@@ -44,6 +44,10 @@ export interface Advisor {
   students: Student[]
 }
 
+export interface AdvisorState {
+  advisor: Advisor | null
+}
+
 export interface Announcement {
   id: number
   topic: string
@@ -52,6 +56,10 @@ export interface Announcement {
   posted_date: Date
   advisor_id?: number
   advisor?: Advisor
+}
+
+export interface AnnouncementState {
+  announcement: Announcement | null
 }
 
 export interface Appointment {
@@ -69,6 +77,10 @@ export interface Appointment {
   advisor?: Advisor
   status?: StatusAppointment
   admin?: Admin
+}
+
+export interface AppointmentState {
+  appointment: Appointment | null
 }
 
 export interface Degree {
@@ -132,6 +144,7 @@ export interface Student {
   appointments: Appointment[]
   feedbacks: Feedback[]
   admin_logs: AdminLog[]
+  advisor?: Advisor
 }
 
 export interface PageStudent {
