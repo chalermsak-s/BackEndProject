@@ -7,4 +7,7 @@ export default {
   getStudent(id: number) {
     return apiClient.get(`/students/${id}`);
   },
+  getStudentList() {
+    return apiClient.get(`/students`);
+  },
 };
