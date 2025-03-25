@@ -35,7 +35,7 @@ model user {
 
 model admin {
   id          Int           @id @default(autoincrement())
-  name        String        @db.VarChar(45)
+  name        String        @db.VarChar(150)
   users       user[]
   advisors    advisor[]
   admin_log   admin_log[]
@@ -45,8 +45,8 @@ model admin {
 
 model advisor {
   id                   Int                @id @default(autoincrement())
-  first_name           String             @db.VarChar(45)
-  last_name            String             @db.VarChar(45)
+  first_name           String             @db.VarChar(150)
+  last_name            String             @db.VarChar(150)
   picture              String?            @db.VarChar(255)
   academic_position_id Int?
   department_id        Int?
@@ -76,9 +76,9 @@ model admin_log {
 
 model student {
   id              Int           @id @default(autoincrement())
-  student_id_card String        @unique @db.VarChar(15)
-  first_name      String        @db.VarChar(45)
-  last_name       String        @db.VarChar(45)
+  student_id_card String        @unique @db.VarChar(50)
+  first_name      String        @db.VarChar(100)
+  last_name       String        @db.VarChar(100)
   picture         String?       @db.VarChar(255)
   department_id   Int?
   degree_id       Int?
@@ -94,7 +94,7 @@ model student {
 
 model degree {
   id          Int       @id @default(autoincrement())
-  degree_name String    @db.VarChar(45)
+  degree_name String    @db.VarChar(255)
   students    student[]
 }
 
@@ -108,13 +108,13 @@ model department {
 
 model academic_position {
   id                     Int       @id @default(autoincrement())
-  academic_position_name String    @db.VarChar(100)
+  academic_position_name String    @db.VarChar(200)
   advisors               advisor[]
 }
 
 model announcement {
   id          Int      @id @default(autoincrement())
-  topic       String   @db.VarChar(70)
+  topic       String   @db.VarChar(255)
   description String?  @db.VarChar(225)
   file        String?  @db.VarChar(255)
   posted_date DateTime @default(now())
@@ -124,7 +124,7 @@ model announcement {
 
 model appointment {
   id                       Int                 @id @default(autoincrement())
-  topic                    String              @db.VarChar(70)
+  topic                    String              @db.VarChar(255)
   description              String?             @db.VarChar(255)
   requested_date           DateTime
   appointment_request_date DateTime
@@ -141,7 +141,7 @@ model appointment {
 
 model status_appointment {
   id           Int           @id @default(autoincrement())
-  status       String        @db.VarChar(45)
+  status       String        @db.VarChar(100)
   appointments appointment[]
 }
 
@@ -153,6 +153,9 @@ model feedback {
   advisor_id   Int?
   responder_id Int?
   admin_id     Int?
+  parent_feedback_id Int?
+  parent_feedback feedback? @relation("FeedbackReplies", fields: [parent_feedback_id], references: [id])
+  replies feedback[] @relation("FeedbackReplies")
   student      student?   @relation(fields: [student_id], references: [id])
   advisor      advisor?   @relation(fields: [advisor_id], references: [id])
   responder    responder? @relation(fields: [responder_id], references: [id])
@@ -161,6 +164,6 @@ model feedback {
 
 model responder {
   id        Int        @id @default(autoincrement())
-  responder String     @db.VarChar(45)
+  responder String     @db.VarChar(200)
   feedbacks feedback[]
 }
