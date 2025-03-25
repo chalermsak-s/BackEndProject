@@ -6,4 +6,16 @@ export default {
   getAppointment(id: number) {
     return apiClient.get(`/appointments/${id}`);
   },
+  getAppointmentsByStudentId(studentId: number) {
+    return apiClient.get(`/appointments/student/${studentId}`);
+  },
+  getAppointmentsByAdvisorId(advisorId: number) {
+    return apiClient.get(`/appointments/advisor/${advisorId}`);
+  },
+  confirmAppointment(appointmentId: number) {
+    return apiClient.put(`/appointments/${appointmentId}/confirm`)
+  },
+  cancelAppointment(appointmentId: number) {
+    return apiClient.put(`/appointments/${appointmentId}/cancel`)
+  }
 };
