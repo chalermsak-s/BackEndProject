@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import type { Student, PageStudent, InStudent } from '../models/student'
+import type { PageStudent, InStudent } from '../models/student'
 
 const prisma = new PrismaClient()
 
@@ -20,6 +20,7 @@ export function getAllStudents() {
       },
       advisor: {
         select: {
+          id: true,
           first_name: true,
           last_name: true,
         },
@@ -46,6 +47,7 @@ export function getStudentById(id: number) {
       },
       advisor: {
         select: {
+          id: true,
           first_name: true,
           last_name: true,
         },
@@ -72,7 +74,7 @@ export function addStudent(newStudent: InStudent) {
           picture: newStudent.picture,
           department_id: newStudent.department_id,
           degree_id: newStudent.degree_id,
-          advisor_id: newStudent.advisor_id
+          advisor_id: newStudent.advisor_id,
         },
       },
     },
@@ -115,6 +117,65 @@ export async function getAllStudentPagination(
   })
   const count = await prisma.student.count({ where })
   return { count, students } as PageStudent
+}
+
+export function getStudentIdByUserId(id: number) {
+  return prisma.user.findFirst({
+    where: {
+      id: id
+    },select:{
+      student_id: true,
+      student:{
+        select:{
+          advisor_id: true,
+        }
+      }
+    }
+  })
+}
+
+export async function updateStudentById(studentId: number, updatedStudent: InStudent) {
+  
+  const user = await prisma.user.findFirst({
+    where: {
+      student: {
+        id: studentId
+      },
+    },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return prisma.user.update({
+    where: {
+      id: user.id
+    },
+    data: {
+      username: updatedStudent.username,
+      password: updatedStudent.password,
+      user_role: {
+        connect: {
+          role_name: 'Student'
+        },
+      },
+      student: {
+        update: {
+          student_id_card: updatedStudent.student_id_card,
+          first_name: updatedStudent.first_name,
+          last_name: updatedStudent.last_name,
+          picture: updatedStudent.picture,
+          department_id: updatedStudent.department_id,
+          degree_id: updatedStudent.degree_id,
+          advisor_id: updatedStudent.advisor_id,
+        },
+      },
+    },
+    include: {
+      student: true,
+    },
+  })
 }
 
 export function countStudent() {

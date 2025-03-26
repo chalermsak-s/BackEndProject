@@ -15,9 +15,6 @@ library.add(faUserCircle, faChevronLeft, faChevronRight)
 const router = useRouter()
 const students = ref<Student[]>([])
 const totalStudents = ref(0)
-
-
-// แบ่งหน้า
 const hasNextPage = computed(() => {
   const totalPages = Math.ceil(totalStudents.value / 3)
   return page.value < totalPages
@@ -47,8 +44,6 @@ watchEffect(() => {
 StudentService.getStudents(page.value, 3).then((response) => {
   students.value = response.data
 })
-
-
 </script>
 
 <template>

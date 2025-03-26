@@ -1,7 +1,7 @@
-import type { Student } from "./student"
-import type { Advisor } from "./advisor"
-import type { Responder } from "./responder"
-import type { Admin } from "./admin"
+import type { Student } from './student'
+import type { Advisor } from './advisor'
+import type { Responder } from './responder'
+import type { Admin } from './admin'
 export interface Feedback {
   id: number
   feedback: string
@@ -14,4 +14,12 @@ export interface Feedback {
   advisor?: Advisor
   responder?: Responder
   admin?: Admin
+}
+
+export interface InsFeedback {
+  feedback: string
+  timestamp: Date
+  student_id: number
+  advisor_id: number
+  responder_id: number
 }

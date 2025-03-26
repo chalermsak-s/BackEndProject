@@ -66,7 +66,7 @@ onMounted(fetchFeedbacks)
                             (currentFeedbackPage - 1) * pageFeedbackSize +
                             index +
                             1
-                        }}</td>
+                            }}</td>
                         <td>{{ feedback.feedback }}</td>
                         <td>{{ UtilService.formatDateTime(feedback.timestamp) }}</td>
                         <td>{{ feedback.responder?.responder }}</td>
@@ -123,4 +123,33 @@ onMounted(fetchFeedbacks)
             </table>
         </div>
     </div>
+
+
+    <!-- AdminLog Table -->
+    <!-- <div class="card bg-white shadow-lg p-4 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4">ข้อมูลประวัติการใช้งาน</h2>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Content</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2025-03-24</td>
+                <td>New Semester Announcement</td>
+                <td>Details about the new semester schedule.</td>
+              </tr>
+              <tr>
+                <td>2025-03-23</td>
+                <td>University Event</td>
+                <td>Upcoming event details and invitation.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> -->
 </template>

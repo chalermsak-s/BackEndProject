@@ -25,3 +25,13 @@ export interface Advisor {
   admin_logs: AdminLog[]
   students: Student[]
 }
+
+export interface InAdvisor {
+  username: string
+  password: string
+  first_name: string
+  last_name: string
+  picture?: string
+  academic_position_id?: number
+  department_id?: number
+}

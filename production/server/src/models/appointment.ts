@@ -18,3 +18,13 @@ export interface Appointment {
   status?: StatusAppointment
   admin?: Admin
 }
+
+export interface InAppoinment{
+  topic: string
+  description: string
+  appointment_request_date: Date
+  student_confirmation: boolean | false
+  student_id: number 
+  advisor_id: number
+  status_appointment_id: number | 4
+}

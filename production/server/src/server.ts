@@ -9,6 +9,9 @@ import degreeRoutes from './routes/degreeRoutes'
 import appointmentRoutes from './routes/appointmentRoutes'
 import announcementRoutes from './routes/announcementRoutes'
 import feedbackRoutes from './routes/feedbackRoutes'
+import academicPositionRoutes from './routes/academicPositionRoutes'
+import statusAppointmentRoutes from './routes/statusAppointmentRoutes'
+
 
 const port = process.env.PORT || 3000
 dotenv.config()
@@ -25,6 +28,8 @@ app.use('/degrees', degreeRoutes)
 app.use('/appointments', appointmentRoutes)
 app.use('/announcements', announcementRoutes)
 app.use('/feedbacks', feedbackRoutes)
+app.use('/academicpositions', academicPositionRoutes)
+app.use('/statusappointments', statusAppointmentRoutes)
 
 app.get('/', (req: Request, res: Response) => {
   res.json({

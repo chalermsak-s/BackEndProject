@@ -1,5 +1,5 @@
 ### Show Me
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjUsImlhdCI6MTc0Mjc1NjQzMSwiZXhwIjoxNzQyNzYwMDMxfQ.DiX2CxxDKAkF1T50vSzVR_rjGfQfUS-j3-p2WgzQ6VE
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc0Mjg5MjMzNywiZXhwIjoxNzQyODk1OTM3fQ.j2mzqsuRrxhCx12SeJvZZi1wiu1n1O5cIg-uXmutGyg
 
 @url1 = http://localhost:3000
 

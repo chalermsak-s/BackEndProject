@@ -8,3 +8,9 @@ export interface Announcement {
   advisor_id?: number
   advisor?: Advisor
 }
+
+export interface InAnnouncement {
+  topic: string
+  description: string
+  file?: string
+}

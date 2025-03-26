@@ -24,7 +24,7 @@ const fetchFeedbacks = async () => {
 }
 
 const currentFeedbackPage = ref(1)
-const pageFeedbackSize = 3
+const pageFeedbackSize = 5
 
 const totalFeedbackPages = computed(() =>
     Math.ceil(feedbacks.value.length / pageFeedbackSize)
@@ -54,10 +54,12 @@ onMounted(fetchFeedbacks)
                 <thead>
                     <tr>
                         <th>ลำดับ</th>
+                        <th>อาจารย์ที่ปรึกษา</th>
+                        <th>นักศึกษา</th>
                         <th>ฟีดแบค</th>
                         <th>เวลาที่ได้ฟีดแบค</th>
                         <th>ผู้ที่ทำการตอบฟีดแบค</th>
-                        <th>ตัวจัดการ</th>
+                        <!-- <th>ตัวจัดการ</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -66,11 +68,16 @@ onMounted(fetchFeedbacks)
                             (currentFeedbackPage - 1) * pageFeedbackSize +
                             index +
                             1
-                            }}</td>
+                        }}</td>
+                        <td>
+                            {{ feedback.advisor?.academic_position?.academic_position_name }}
+                            {{ feedback.advisor?.first_name }}&nbsp;{{ feedback.advisor?.last_name }}
+                        </td>
+                        <td>{{ feedback.student?.first_name }}&nbsp;{{ feedback.student?.last_name }}</td>
                         <td>{{ feedback.feedback }}</td>
                         <td>{{ UtilService.formatDateTime(feedback.timestamp) }}</td>
                         <td>{{ feedback.responder?.responder }}</td>
-                        <td>
+                        <!-- <td>
                             <RouterLink :to="feedback.id
                                 ? {
                                     name: '',
@@ -78,7 +85,7 @@ onMounted(fetchFeedbacks)
                                 }
                                 : '#'
                                 " class="btn">ละเอียด</RouterLink>
-                        </td>
+                        </td> -->
                     </tr>
                 </tbody>
             </table>

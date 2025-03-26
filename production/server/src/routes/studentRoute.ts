@@ -5,9 +5,9 @@ import { uploadFile } from '../services/uploadFileService'
 import * as studentService from '../services/studentService'
 import type { InStudent } from '../models/student'
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage() })
 const router = express.Router()
-dotenv.config();
+dotenv.config()
 
 router.get('/', async (req: Request, res: Response) => {
   if (req.query.pageSize && req.query.pageNo) {
@@ -57,31 +57,41 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 })
 
+router.get('/student-id/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+  const student = await studentService.getStudentIdByUserId(id)
+  if (student) {
+    res.json(student)
+  } else {
+    res.status(404).send('Student not found')
+  }
+})
+
 router.post('/', upload.single('file'), async (req: Request, res: Response) => {
   try {
     // รับไฟล์จาก req.file
-    const file = req.file;
+    const file = req.file
     if (!file) {
-      return res.status(400).send('No file uploaded.');
+      return res.status(400).send('No file uploaded.')
     }
 
-    const bucket = process.env.SUPABASE_BUCKET_NAME;
-    const filePath = process.env.UPLOAD_DIR;
+    const bucket = process.env.SUPABASE_BUCKET_NAME
+    const filePath = process.env.UPLOAD_DIR
 
     // ตรวจสอบการตั้งค่าของ bucket และ file path
     if (!bucket || !filePath) {
-      return res.status(500).send('Bucket name or file path not configured.');
+      return res.status(500).send('Bucket name or file path not configured.')
     }
 
     // เรียกฟังก์ชัน uploadFile เพื่ออัปโหลดไฟล์ไปยัง Supabase และรับ URL
-    const ouputUrl = await uploadFile(bucket, filePath, file);
+    const ouputUrl = await uploadFile(bucket, filePath, file)
 
     // รับข้อมูลจาก req.body
-    const newStudent: InStudent = req.body;
+    const newStudent: InStudent = req.body
 
     // ตรวจสอบว่า req.body มีค่าหรือไม่
     if (!newStudent) {
-      return res.status(400).json({ error: 'Invalid request body' });
+      return res.status(400).json({ error: 'Invalid request body' })
     }
 
     // เตรียมข้อมูล student สำหรับเพิ่ม
@@ -94,24 +104,84 @@ router.post('/', upload.single('file'), async (req: Request, res: Response) => {
       picture: ouputUrl, // URL ที่ได้จากการอัปโหลดไฟล์
       department_id: Number(newStudent.department_id),
       degree_id: Number(newStudent.degree_id),
-      advisor_id: Number(newStudent.advisor_id)
-    };
+      advisor_id: Number(newStudent.advisor_id),
+    }
 
     // เรียก service เพื่อเพิ่มข้อมูลนักศึกษา
-    const result = await studentService.addStudent(dataStudent);
+    const result = await studentService.addStudent(dataStudent)
 
     // ส่งข้อมูลที่เพิ่มสำเร็จกลับไป
-    res.status(201).json(result);
+    res.status(201).json(result)
   } catch (error) {
-    console.error('Error adding student:', error);
+    console.error('Error adding student:', error)
 
     // ตรวจสอบ error ที่เกิดขึ้น และส่ง response ตามกรณี
     if (error instanceof Error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message })
     } else {
-      res.status(500).json({ error: 'An unexpected error occurred' });
+      res.status(500).json({ error: 'An unexpected error occurred' })
     }
   }
-});
+})
+
+/* Update Student */
+
+router.put('/:id', upload.single('file'), async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+  try {
+    // รับไฟล์จาก req.file
+    const file = req.file
+    if (!file) {
+      return res.status(400).send('No file uploaded.')
+    }
+
+    const bucket = process.env.SUPABASE_BUCKET_NAME
+    const filePath = process.env.UPLOAD_DIR
+
+    // ตรวจสอบการตั้งค่าของ bucket และ file path
+    if (!bucket || !filePath) {
+      return res.status(500).send('Bucket name or file path not configured.')
+    }
+
+    // เรียกฟังก์ชัน uploadFile เพื่ออัปโหลดไฟล์ไปยัง Supabase และรับ URL
+    const ouputUrl = await uploadFile(bucket, filePath, file)
+
+    // รับข้อมูลจาก req.body
+    const newStudent: InStudent = req.body
+
+    // ตรวจสอบว่า req.body มีค่าหรือไม่
+    if (!newStudent) {
+      return res.status(400).json({ error: 'Invalid request body' })
+    }
+
+    // เตรียมข้อมูล student สำหรับเพิ่ม
+    const dataStudent = {
+      username: newStudent.username,
+      password: newStudent.password,
+      student_id_card: newStudent.student_id_card,
+      first_name: newStudent.first_name,
+      last_name: newStudent.last_name,
+      picture: ouputUrl, // URL ที่ได้จากการอัปโหลดไฟล์
+      department_id: Number(newStudent.department_id),
+      degree_id: Number(newStudent.degree_id),
+      advisor_id: Number(newStudent.advisor_id),
+    }
+
+    // เรียก service เพื่อเพิ่มข้อมูลนักศึกษา
+    const result = await studentService.updateStudentById(id,dataStudent)
+
+    // ส่งข้อมูลที่เพิ่มสำเร็จกลับไป
+    res.status(201).json(result)
+  } catch (error) {
+    console.error('Error adding student:', error)
+
+    // ตรวจสอบ error ที่เกิดขึ้น และส่ง response ตามกรณี
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message })
+    } else {
+      res.status(500).json({ error: 'An unexpected error occurred' })
+    }
+  }
+})
 
 export default router

@@ -17,5 +17,14 @@ export default {
   },
   cancelAppointment(appointmentId: number) {
     return apiClient.put(`/appointments/${appointmentId}/cancel`)
-  }
+  },
+  getAppointmentByAdvisorId(id: number) {
+    return apiClient.get(`/appointments/appointment-advisor/${id}`);
+  },
+  confirmAppointmentAdvisor(appointmentId: number) {
+    return apiClient.put(`/appointments/advisor/${appointmentId}/confirm`)
+  },
+  cancelAppointmentAdvisor(appointmentId: number) {
+    return apiClient.put(`/appointments/advisor/${appointmentId}/cancel`)
+  },
 };

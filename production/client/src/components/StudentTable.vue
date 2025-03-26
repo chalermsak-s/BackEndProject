@@ -80,7 +80,7 @@ onMounted(fetchStudents)
                     {{ (currentStduentPage - 1) * pageStudentSize + index + 1 }}
                   </td>
                   <td>{{ student.student_id_card }}</td>
-                  <td>{{ student.first_name }} {{ student.first_name }}</td>
+                  <td class="whitespace-nowrap">{{ student.first_name }} {{ student.first_name }}</td>
                   <td>{{ student.department?.department_name }}</td>
                   <td>
                     <RouterLink :to="student.id

@@ -83,7 +83,7 @@ onMounted(fetchAppointments)
                                     )
                                 }}
                             </td>
-                            <td>
+                            <td class="whitespace-nowrap">
                                 {{ appointment.student?.first_name }}
                                 {{ appointment.student?.last_name }}
                             </td>

@@ -189,6 +189,16 @@ export interface RegisterForm {
   advisor_id: string
 }
 
+export interface RegisterAdvisor {
+  username: string
+  password: string
+  first_name: string
+  last_name: string
+  file: File | null
+  academic_position_id: number | null
+  department_id: number | null
+}
+
 export interface MessageState {
   message: string;
 }
