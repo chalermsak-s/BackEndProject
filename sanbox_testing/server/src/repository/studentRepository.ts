@@ -188,6 +188,35 @@ export function updateAdvisorIdByStudentId(id: number, advisorId: number) {
   });
 }
 
+export function getAllStudentsByAdvisorId(advisorId: number) {
+  return prisma.student.findMany({
+    where: { advisor_id: advisorId },
+    select: {
+      id: true,
+      student_id_card: true,
+      first_name: true,
+      last_name: true,
+      picture: true,
+      department: true,
+      degree: true,
+      users: {
+        select: {
+          username: true,
+        },
+      },
+      advisor: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
+    },
+  });
+}
+
+
+
 export function countStudent() {
   return prisma.student.count();
 }
