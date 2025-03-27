@@ -337,6 +337,41 @@ const router = createRouter({
         }
       },
     },
+    {
+      path: '/admin/detail/appointment-request/:id',
+      name: 'admin-appointment-detail-view-request',
+      component: AdvisorAppointmentDetailViewRequest,
+      props: true,
+      beforeEnter: async (to: any) => {
+        const authStore = useAuthStore()
+        if (!authStore.isAdmin) {
+          return {
+            name: '404-resource-view',
+            params: { resource: 'you-are-not-allowed-to-access' },
+          }
+        } else {
+          const id = Number(to.params.id) // ป้องกัน NaN
+          if (isNaN(id)) {
+            return {
+              name: '404-resource-view',
+              params: { resource: 'appointment' },
+            }
+          }
+          const appointmentStore = useAppointmentStore()
+          try {
+            const response = await AppointmentService.getAppointmentByAdvisorId(id)
+            appointmentStore.setStore(response.data)
+            return true // อนุญาตให้ไปต่อ
+          } catch (error: any) {
+            console.error('Fetch Appointment Error:', error) // เพิ่ม log สำหรับ debug
+            const status = error.response?.status
+            return status === 404
+              ? { name: '404-resource-view', params: { resource: 'appointment' } }
+              : { name: 'network-error-view' }
+          }
+        }
+      },
+    },
     /* Admin End */
 
     /* Advisor Start */

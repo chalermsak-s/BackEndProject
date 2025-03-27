@@ -66,7 +66,7 @@ onMounted(fetchStudents)
       <div class="mb-4">
         <input
           v-model="searchQuery"
-          type="text"
+          type="search"
           placeholder="ค้นหาด้วยชื่อ นามสกุล หรือรหัสนักศึกษา"
           class="input input-bordered w-full"
         />
