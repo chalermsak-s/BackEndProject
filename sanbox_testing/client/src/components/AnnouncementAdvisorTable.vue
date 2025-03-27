@@ -14,8 +14,14 @@ const fetchAnnouncements = async () => {
     try {
         const id = await AdvisorService.getAdvisorIdByUserId()
         const response = await AnnouncementService.getAnnouncementByAdvisorId(id)
-        announcements.value = response.data
-    } catch (err) {
+        // ไม่เรียงตามอะไร 
+        // announcements.value = response.data
+        
+        // เรียงลำดับประกาศจากล่าสุดไปเก่าสุด
+        announcements.value = response.data.sort((a: Announcement, b: Announcement) => 
+            new Date(b.posted_date).getTime() - new Date(a.posted_date).getTime()
+        )
+        } catch (err) {
         error.value =
             'Error fetching announcements: ' +
             (err instanceof Error ? err.message : err)
