@@ -51,7 +51,7 @@ library.add(faRotateLeft)
             วันที่ส่งคำขอนัดหมาย
             <span>{{
               UtilService.formatDateTime(appointment?.requested_date ?? '')
-            }}</span>
+              }}</span>
           </div>
           <div class="border-t-base-content/5 flex items-center justify-between gap-2 border-t border-dashed py-2">
             วันและเวลาทีต้องการนัดหมาย
@@ -62,15 +62,15 @@ library.add(faRotateLeft)
             }}</span>
           </div>
           <div class="border-t-base-content/5 flex items-center justify-between gap-2 border-t border-dashed py-2">
+            สถานะ
+            <span v-html="UtilService.statusToHtml(appointment?.status?.status)"></span>
+          </div>
+          <div class="border-t-base-content/5 flex items-center justify-between gap-2 border-t border-dashed py-2">
             นักศึกษาได้กดยืนยันการนัดหมาย
             <span v-html="UtilService.statusToHtmlStudent(
               appointment?.student_confirmation
             )
               "></span>
-          </div>
-          <div class="border-t-base-content/5 flex items-center justify-between gap-2 border-t border-dashed py-2">
-            สถานะ
-            <span v-html="UtilService.statusToHtml(appointment?.status?.status)"></span>
           </div>
         </div>
       </div>

@@ -15,6 +15,11 @@ export function getStudentIdByUserId(id: number) {
   return studentRepository.getStudentIdByUserId(id)
 }
 
+
+export function getAllStudentsByAdvisorId(id: number) {
+  return studentRepository.getAllStudentsByAdvisorId(id)
+}
+
 export function addStudent(newStudent: InStudent) {
   const dataStudent = {
     username: newStudent.username,
@@ -58,6 +63,9 @@ export async function getAllStudentPagination(
   return pageStudents
 }
 
+export function updateAdvisorIdByStudentId(id: number,advisor_id:number) {
+  return studentRepository.updateAdvisorIdByStudentId(id,advisor_id)
+}
 
 export function count() {
   return studentRepository.countStudent()

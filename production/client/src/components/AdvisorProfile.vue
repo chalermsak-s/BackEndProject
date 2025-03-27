@@ -75,11 +75,14 @@ const fetchAppointments = async () => {
     loadingAppointments.value = true
     const advisorId = await AdvisorService.getAdvisorIdByUserId()
     const response = await AppointmentService.getAppointmentByAdvisorId(advisorId)
+    console.log('Fetched Appointments:', response.data) // ✅ ตรวจสอบข้อมูล API
     // appointments.value = response.data
     // กรองเฉพาะนัดหมายที่มี status.id === 2 (Pending)
+
     appointments.value = response.data.filter(
-      (appt: Appointment) => appt.status_appointment_id === 2
+      (appt: Appointment) => appt.status_appointment_id === 2 
     )
+    console.log('Filtered Appointments:', appointments.value) // ✅ ตรวจสอบข้อมูลหลังกรอง
   } catch (err) {
     appointmentError.value = 'Error fetching appointments: ' +
       (err instanceof Error ? err.message : 'Unknown error')
@@ -88,10 +91,41 @@ const fetchAppointments = async () => {
   }
 }
 
+const approvedAppointments = ref<Appointment[]>([])
+const loadingApprovedAppointments = ref(false)
+const approvedAppointmentError = ref<string | null>(null)
+
+const fetchApprovedAppointments = async () => {
+  try {
+    loadingApprovedAppointments.value = true
+    const advisorId = await AdvisorService.getAdvisorIdByUserId()
+    const response = await AppointmentService.getAppointmentByAdvisorId(advisorId)
+    console.log('Fetched Approved Appointments:', response.data) // ✅ ตรวจสอบข้อมูล API
+    
+    const today = new Date() // วันที่ปัจจุบัน
+    
+    approvedAppointments.value = response.data.filter(
+      (appt: Appointment) => 
+        appt.status_appointment_id === 1 && new Date(appt.appointment_request_date) >= today
+    )
+
+    console.log('Filtered Approved Appointments:', approvedAppointments.value) // ✅ ตรวจสอบข้อมูลหลังกรอง
+  } catch (err) {
+    approvedAppointmentError.value = 'Error fetching approved appointments: ' +
+      (err instanceof Error ? err.message : 'Unknown error')
+  } finally {
+    loadingApprovedAppointments.value = false
+  }
+}
+
+
+
+
 onMounted(async () => {
   await fetchAdvisors()
   await fetchAnnouncements()
   await fetchAppointments()
+  await fetchApprovedAppointments()
 })
 
 /* Advisor End */
@@ -112,6 +146,8 @@ onMounted(async () => {
           <li><a><i class="fa fa-calendar"></i> All Announcements <span class="badge badge-warning">{{
                 announcements.length }}</span></a></li>
           <li><a><i class="fa fa-calendar"></i> All Request <span class="badge badge-warning">{{ appointments.length
+                }}</span></a></li>
+          <li><a><i class="fa fa-calendar"></i> All upcoming appointments <span class="badge badge-warning">{{ approvedAppointments.length
                 }}</span></a></li>
         </ul>
 

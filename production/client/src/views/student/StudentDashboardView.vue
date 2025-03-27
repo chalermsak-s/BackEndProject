@@ -1,34 +1,76 @@
 <script setup lang="ts">
+import { ref, onMounted, watch, onUnmounted } from 'vue';
 import StudentProfile from '@/components/StudentProfile.vue';
 import AnnouncementList from '@/components/AnnouncementList.vue';
 import AppointmentList from '@/components/AppointmentList.vue';
 import FeedbackStudentView from '@/components/FeedbackStudentView.vue';
+import StudentService from '@/services/StudentService';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+library.add(faTriangleExclamation)
+const advisorId = ref<number | null>(null);
+const statusAdvisor = ref<boolean>(false);
+let fetchInterval: number | null = null; // ใช้เก็บตัว interval
+
+const fetchStudentAdvisor = async () => {
+  try {
+    const newAdvisorId = await StudentService.getAdvisorIdByUserId(); // ดึงข้อมูลใหม่
+    statusAdvisor.value = newAdvisorId !== null;
+
+    // เช็คว่า advisorId เปลี่ยนแปลงหรือไม่
+    if (newAdvisorId !== advisorId.value) {
+      console.log(`Advisor ID changed from ${advisorId.value} to ${newAdvisorId}`);
+      advisorId.value = newAdvisorId;
+    }
+  } catch (error) {
+    advisorId.value = null;
+    statusAdvisor.value = false;
+    console.error('Error fetching advisor:', error instanceof Error ? error.message : error);
+  }
+};
+
+onMounted(() => {
+  fetchStudentAdvisor(); // โหลดข้อมูลครั้งแรก
+
+  // ตั้งค่า interval ให้ดึงข้อมูลใหม่ทุก 10 วินาที
+  fetchInterval = setInterval(fetchStudentAdvisor, 10000);
+});
+
+onUnmounted(() => {
+  // ลบ interval เมื่อออกจากหน้าจอเพื่อป้องกันการโหลดซ้ำเกินจำเป็น
+  if (fetchInterval) {
+    clearInterval(fetchInterval);
+  }
+});
+
+// Watch การเปลี่ยนแปลงของ statusAdvisor
+watch(statusAdvisor, (newValue, oldValue) => {
+  console.log(`statusAdvisor changed from ${oldValue} to ${newValue}`);
+});
 </script>
 
+
 <template>
-
-  <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 m-4">
-    <div class="lg:col-span-1">
+  <div class="container mx-auto p-4 m-5">
+    <div class="flex flex-col md:flex-row gap-4">
+      <!-- Profile Sidebar -->
       <StudentProfile />
-    </div>
-    <div class="lg:col-span-2">
-      <AnnouncementList />
-    </div>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 m-4">
-    <div class="lg:col-span-1">
-      <AppointmentList />
-    </div>
-    <div class="lg:col-span-1">
-      <Suspense>
-        <template #default>
-          <FeedbackStudentView />
-        </template>
-        <template #fallback>
-          <div>Loading feedback...</div>
-        </template>
-      </Suspense>
+      <!-- Profile Content -->
+      <div class="w-full md:w-2/3 lg:w-3/4">
+        <div v-if="!statusAdvisor" role="alert" class="alert alert-vertical alert-dash">
+          <span><font-awesome-icon :icon="['fas', 'triangle-exclamation']" /> กรุณารอการยืนยันการกำหนดอาจารย์ที่ปรึกษาจากระบบก่อนจึงจะสามารถเข้าใช้งานได้</span>
+        </div>
+        <AnnouncementList v-if="statusAdvisor" />
+        <AppointmentList v-if="statusAdvisor" />
+        <Suspense v-if="statusAdvisor">
+          <template #default>
+            <FeedbackStudentView />
+          </template>
+          <template #fallback>
+            <div>Loading feedback...</div>
+          </template>
+        </Suspense>
+      </div>
     </div>
   </div>
-
 </template>

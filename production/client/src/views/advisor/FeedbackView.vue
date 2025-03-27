@@ -109,7 +109,8 @@ const submitForm = async () => {
                     <div class="chat chat-start" v-if="item.responder_id === 1">
                         <div class="chat-image avatar">
                             <div class="w-10 rounded-full">
-                                <img alt="Student Avatar" src="https://www.svgrepo.com/show/520490/student.svg" class="object-cover" />
+                                <img :src="item.student?.picture || 'https://www.svgrepo.com/show/520490/student.svg'"
+                                :alt="item.student?.picture ? 'รูปนักศึกษา' : 'Student Avatar'" class="object-cover" />
                             </div>
                         </div>
                         <div class="chat-header">
@@ -123,7 +124,8 @@ const submitForm = async () => {
                     <div class="chat chat-end" v-if="item.responder_id === 2">
                         <div class="chat-image avatar">
                             <div class="w-10 rounded-full">
-                                <img alt="Teacher Avatar" src="https://www.svgrepo.com/show/240382/teacher.svg" class="object-cover" />
+                                <img :src="item.advisor?.picture || 'https://dev.kumawork.com/project_images_backend/advisor.png'"
+                                :alt="item.advisor?.picture ? 'รูปอาจารย์' : 'Teacher Avatar'" class="object-cover" />
                             </div>
                         </div>
                         <div class="chat-header">

@@ -57,6 +57,16 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 })
 
+router.get('/advisor-id/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+  const student = await studentService.getAllStudentsByAdvisorId(id)
+  if (student) {
+    res.json(student)
+  } else {
+    res.status(404).send('Student By AdvisorId not found')
+  }
+})
+
 router.get('/student-id/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id)
   const student = await studentService.getStudentIdByUserId(id)
@@ -181,6 +191,17 @@ router.put('/:id', upload.single('file'), async (req: Request, res: Response) =>
     } else {
       res.status(500).json({ error: 'An unexpected error occurred' })
     }
+  }
+})
+
+router.put('/update/advisor/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+  const advisor_id = parseInt(req.body.advisor_id)
+  const student = await studentService.updateAdvisorIdByStudentId(id,advisor_id)
+  if (student) {
+    res.json(student)
+  } else {
+    res.status(404).send('Student  not found')
   }
 })
 

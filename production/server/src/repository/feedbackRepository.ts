@@ -15,6 +15,7 @@ export function getAllFeedbacks() {
       student: {
         select: {
           student_id_card: true,
+          picture: true,
           first_name: true,
           last_name: true,
         },
@@ -23,6 +24,7 @@ export function getAllFeedbacks() {
         select: {
           first_name: true,
           last_name: true,
+          picture: true,
         },
       },
       responder: {
@@ -48,6 +50,7 @@ export function getFeedbackById(id: number) {
       student: {
         select: {
           student_id_card: true,
+          picture: true,
           first_name: true,
           last_name: true,
         },
@@ -56,6 +59,7 @@ export function getFeedbackById(id: number) {
         select: {
           first_name: true,
           last_name: true,
+          picture: true,
         },
       },
       responder: {
@@ -81,6 +85,7 @@ export function getFeedbackByStudentId(id: number) {
       student: {
         select: {
           student_id_card: true,
+          picture: true,
           first_name: true,
           last_name: true,
         },
@@ -89,6 +94,7 @@ export function getFeedbackByStudentId(id: number) {
         select: {
           first_name: true,
           last_name: true,
+          picture: true,
         },
       },
       responder: {

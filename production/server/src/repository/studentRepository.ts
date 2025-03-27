@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
-import type { PageStudent, InStudent } from '../models/student'
+import { PrismaClient } from "@prisma/client";
+import type { PageStudent, InStudent } from "../models/student";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export function getAllStudents() {
   return prisma.student.findMany({
@@ -26,7 +26,7 @@ export function getAllStudents() {
         },
       },
     },
-  })
+  });
 }
 
 export function getStudentById(id: number) {
@@ -53,7 +53,7 @@ export function getStudentById(id: number) {
         },
       },
     },
-  })
+  });
 }
 
 export function addStudent(newStudent: InStudent) {
@@ -63,7 +63,7 @@ export function addStudent(newStudent: InStudent) {
       password: newStudent.password,
       user_role: {
         connect: {
-          role_name: 'Student', // Replace "Student" with the actual role name or use an ID
+          role_name: "Student", // Replace "Student" with the actual role name or use an ID
         },
       },
       student: {
@@ -81,7 +81,7 @@ export function addStudent(newStudent: InStudent) {
     include: {
       student: true,
     },
-  })
+  });
 }
 
 export async function getAllStudentPagination(
@@ -95,7 +95,7 @@ export async function getAllStudentPagination(
       { first_name: { contains: keyword } },
       { last_name: { contains: keyword } },
     ],
-  }
+  };
 
   const students = await prisma.student.findMany({
     where,
@@ -114,50 +114,53 @@ export async function getAllStudentPagination(
         },
       },
     },
-  })
-  const count = await prisma.student.count({ where })
-  return { count, students } as PageStudent
+  });
+  const count = await prisma.student.count({ where });
+  return { count, students } as PageStudent;
 }
 
 export function getStudentIdByUserId(id: number) {
   return prisma.user.findFirst({
     where: {
-      id: id
-    },select:{
+      id: id,
+    },
+    select: {
       student_id: true,
-      student:{
-        select:{
+      student: {
+        select: {
           advisor_id: true,
-        }
-      }
-    }
-  })
+        },
+      },
+    },
+  });
 }
 
-export async function updateStudentById(studentId: number, updatedStudent: InStudent) {
-  
+export async function updateStudentById(
+  studentId: number,
+  updatedStudent: InStudent
+) {
   const user = await prisma.user.findFirst({
     where: {
       student: {
-        id: studentId
+        id: studentId,
       },
     },
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   return prisma.user.update({
     where: {
-      id: user.id
+      id: user.id,
     },
     data: {
       username: updatedStudent.username,
       password: updatedStudent.password,
       user_role: {
         connect: {
-          role_name: 'Student'
+          role_name: "Student",
         },
       },
       student: {
@@ -175,9 +178,45 @@ export async function updateStudentById(studentId: number, updatedStudent: InStu
     include: {
       student: true,
     },
-  })
+  });
 }
 
+export function updateAdvisorIdByStudentId(id: number, advisorId: number) {
+  return prisma.student.update({
+    where: { id },
+    data: { advisor_id: advisorId },
+  });
+}
+
+export function getAllStudentsByAdvisorId(advisorId: number) {
+  return prisma.student.findMany({
+    where: { advisor_id: advisorId },
+    select: {
+      id: true,
+      student_id_card: true,
+      first_name: true,
+      last_name: true,
+      picture: true,
+      department: true,
+      degree: true,
+      users: {
+        select: {
+          username: true,
+        },
+      },
+      advisor: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
+    },
+  });
+}
+
+
+
 export function countStudent() {
-  return prisma.student.count()
+  return prisma.student.count();
 }
