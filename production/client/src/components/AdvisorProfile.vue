@@ -100,7 +100,7 @@ onMounted(async () => {
   <div class="w-full md:w-1/3">
     <div class="card bg-base-100 shadow-xl p-4 ">
       <figure class="px-10 pt-10">
-        <img :src="typedAdvisorProfile?.picture || 'https://img.freepik.com/free-photo/view-3d-male-teacher_23-2150710024.jpg'"
+        <img :src="typedAdvisorProfile?.picture || 'https://dev.kumawork.com/project_images_backend/advisor.png'"
         :alt="typedAdvisorProfile?.picture ? 'รูปอาจารย์ที่ปรึกษา' : 'Profile'" class="rounded-full w-24 h-24 object-cover" />
       </figure>
       <div class="card-body items-center text-center">

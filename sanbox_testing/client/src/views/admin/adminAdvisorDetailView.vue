@@ -5,6 +5,9 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faRotateLeft } from '@fortawesome/free-solid-svg-icons'
+
+import StudentTableFromAdvisor from '@/components/StudentTableFromAdvisor.vue'
+
 const store = useAdvisorStore()
 const router = useRouter()
 const { advisor } = storeToRefs(store)
@@ -15,27 +18,35 @@ library.add(faRotateLeft)
 
 const imageExists = ref(false)
 
-// ตรวจสอบว่า URL ของภาพมีอยู่จริงไหม
-const checkImageExists = async (imageUrl: string) => {
-  try {
-    if (isValidUrl(imageUrl)) {
-      const response = await fetch(imageUrl, { method: 'HEAD' })
-      imageExists.value = response.ok // ถ้าผลตอบรับเป็น 200 OK หมายความว่ามีภาพ
-    } else {
-      imageExists.value = false
-    }
-  } catch (error) {
-    console.error('Error checking image URL:', error) // Log the error for debugging
-    imageExists.value = false // ถ้ามีข้อผิดพลาด หมายความว่าไม่สามารถเข้าถึงภาพ
+/**
+ * Check if the image URL exists.
+ * @param imageUrl - The URL of the image to check.
+ */
+ const checkImageExists = (imageUrl: string): void => {
+  const img = new Image()
+  img.src = imageUrl
+
+  img.onload = () => {
+    imageExists.value = true // โหลดสำเร็จ (รูปมีอยู่)
+  }
+
+  img.onerror = () => {
+    imageExists.value = false // โหลดไม่สำเร็จ (รูปไม่มีอยู่)
   }
 }
 
-const isValidUrl = (url: string): boolean => {
-  const regex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i // Regular Expression สำหรับตรวจสอบ URL
-  return regex.test(url)
-}
 
-// ใช้ watchEffect เพื่อตรวจสอบ URL ของภาพเมื่อข้อมูล advisor เปลี่ยน
+/**
+ * Validate if a string is a valid URL.
+ * @param url - The string to validate.
+ * @returns True if the string is a valid URL, false otherwise.
+ */
+// const isValidUrl = (url: string): boolean => {
+//   const regex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i // Regular Expression for URL validation
+//   return regex.test(url)
+// }
+
+// Watch for changes in the advisor object and check the image URL
 watchEffect(() => {
   if (advisor.value?.picture) {
     checkImageExists(advisor.value.picture)
@@ -44,32 +55,49 @@ watchEffect(() => {
   }
 })
 </script>
+
 <template>
-  <div class="flex justify-center p-4">
-    <div class="card card-border bg-base-100 w-full max-w-xs sm:max-w-sm md:max-w-md shadow-lg">
-      <figure class="px-10 pt-10">
-        <img v-if="imageExists" :src="advisor?.picture ?? ''" alt="รูปอาจารย์ที่ปรึกษา"
-          class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto rounded-xl object-cover" />
-        <img v-else src="https://www.svgrepo.com/show/23257/teacher.svg" alt="Profile"
-          class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto rounded-xl object-cover" />
-      </figure>
-      <div class="card-body">
-        <h2 class="card-title">
-          ตำแหน่งทางวิชาการ
-          {{ advisor?.academic_position?.academic_position_name }}
-        </h2>
-        <p>ชื่อ {{ advisor?.first_name }} นามสกุล {{ advisor?.last_name }}</p>
-        <p>หลักสูตร {{ advisor?.department?.initials }}</p>
-        <p>ภาควิชา {{ advisor?.department?.department_name }}</p>
-        <p>
-          {{ advisor?.students }}
-        </p>
-        <div class="card-actions justify-end">
-          <button @click="goBack" class="btn">
-            <font-awesome-icon :icon="['fas', 'rotate-left']" /> ถอยกลับ
-          </button>
+  <div class="grid grid-cols-12 gap-4 p-4">
+    <!-- Image Section (4 columns) -->
+    <div class="col-span-12 md:col-span-4 flex justify-center">
+      <div class="card card-border bg-base-100 w-full max-w-xs sm:max-w-sm md:max-w-md shadow-lg">
+        <figure class="px-10 pt-10">
+          <img
+            v-if="imageExists"
+            :src="advisor?.picture ?? ''"
+            alt="รูปอาจารย์ที่ปรึกษา"
+            class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto rounded-xl object-cover"
+          />
+          <img
+            v-else
+            src="https://dev.kumawork.com/project_images_backend/advisor.png"
+            alt="Profile"
+            class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto rounded-xl object-cover"
+          />
+        </figure>
+        <div class="card-body">
+          <h2 class="card-title">
+            ตำแหน่งทางวิชาการ
+            {{ advisor?.academic_position?.academic_position_name }}
+          </h2>
+          <p>ชื่อ {{ advisor?.first_name }} นามสกุล {{ advisor?.last_name }}</p>
+          <p>หลักสูตร {{ advisor?.department?.initials }}</p>
+          <p>ภาควิชา {{ advisor?.department?.department_name }}</p>
+          <p>
+            {{ advisor?.students }}
+          </p>
+          <div class="card-actions justify-end">
+            <button @click="goBack" class="btn">
+              <font-awesome-icon :icon="['fas', 'rotate-left']" /> ถอยกลับ
+            </button>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- Data Section (8 columns) -->
+    <div class="col-span-12 md:col-span-8">
+      <StudentTableFromAdvisor />
     </div>
   </div>
 </template>

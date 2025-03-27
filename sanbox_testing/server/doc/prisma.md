@@ -24,3 +24,24 @@
 npx prisma migrate dev --name fix_schema_relations
 
 ## รหัสผ่าน Prisma ห้ามขึ้นด้วยตัวเลขต้องเป็นตัวอักษรก่อน
+
+
+
+## Github 
+
+## ลอง pull ก่อน
+
+ 	git pull origin main
+ 
+## ถ้าติด conflict ใช้ stash แล้ว pull
+
+	git stash
+	git pull origin main
+	git stash pop
+
+## ถ้า conflict ต้องแก้โค้ดเอง แล้ว commit
+
+	git add .
+	git commit -m "Resolve conflict"
+	git push origin main
+

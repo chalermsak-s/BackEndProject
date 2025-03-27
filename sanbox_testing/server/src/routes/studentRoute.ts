@@ -57,6 +57,16 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 })
 
+router.get('/advisor-id/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+  const student = await studentService.getAllStudentsByAdvisorId(id)
+  if (student) {
+    res.json(student)
+  } else {
+    res.status(404).send('Student By AdvisorId not found')
+  }
+})
+
 router.get('/student-id/:id', async (req: Request, res: Response) => {
   const id = parseInt(req.params.id)
   const student = await studentService.getStudentIdByUserId(id)

@@ -21,5 +21,8 @@ export default {
     const id = Number(authStore.user?.id)
     const response = await apiClient.get(`/students/student-id/${id}`);
     return  response.data.student.advisor_id
+  },
+  getStudentListByAdvisorId(id: number) {
+    return apiClient.get(`/students/advisor-id/${id}`);
   }
 };

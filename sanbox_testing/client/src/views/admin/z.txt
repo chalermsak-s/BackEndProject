@@ -1,0 +1,27 @@
+ <div class="flex justify-center p-4">
+    <div class="card card-border bg-base-100 w-full max-w-xs sm:max-w-sm md:max-w-md shadow-lg">
+      <figure class="px-10 pt-10">
+        <img v-if="imageExists" :src="advisor?.picture ?? ''" alt="รูปอาจารย์ที่ปรึกษา"
+          class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto rounded-xl object-cover" />
+        <img v-else src="https://www.svgrepo.com/show/23257/teacher.svg" alt="Profile"
+          class="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl h-auto rounded-xl object-cover" />
+      </figure>
+      <div class="card-body">
+        <h2 class="card-title">
+          ตำแหน่งทางวิชาการ
+          {{ advisor?.academic_position?.academic_position_name }}
+        </h2>
+        <p>ชื่อ {{ advisor?.first_name }} นามสกุล {{ advisor?.last_name }}</p>
+        <p>หลักสูตร {{ advisor?.department?.initials }}</p>
+        <p>ภาควิชา {{ advisor?.department?.department_name }}</p>
+        <p>
+          {{ advisor?.students }}
+        </p>
+        <div class="card-actions justify-end">
+          <button @click="goBack" class="btn">
+            <font-awesome-icon :icon="['fas', 'rotate-left']" /> ถอยกลับ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
