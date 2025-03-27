@@ -21,7 +21,6 @@ onMounted(fetchStudentAdvisor);
 </script>
 
 <template>
-  <h1>ค่า advisorID{{ advisorId }}</h1>
   <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 m-4">
     <div class="lg:col-span-1">
       <StudentProfile />
