@@ -127,14 +127,14 @@ onMounted(() => {
     </figure>
     <div class="card-body">
       <h2 class="card-title">รหัสนักศึกษา {{ student?.student_id_card }}</h2>
-      <p>ชื่อ {{ student?.first_name }} นามสกุล {{ student?.last_name }}</p>
+      <p>ชื่อ-นามสกุล: {{ student?.first_name }} {{ student?.last_name }}</p>
       <p>
-        {{ student?.degree?.degree_name }}
+        ระดับการศึกษา: {{ student?.degree?.degree_name }}
       </p>
-      <p>หลักสูตร {{ student?.department?.initials }}</p>
-      <p>สาขาวิชา {{ student?.department?.department_name }}</p>
+      <p>หลักสูตร: {{ student?.department?.initials }}</p>
+      <p>สาขาวิชา: {{ student?.department?.department_name }}</p>
       <p>
-        อาจารย์ที่ปรึกษา {{ student?.advisor?.first_name }}
+        อาจารย์ที่ปรึกษา: {{ student?.advisor?.first_name }}
         {{ student?.advisor?.last_name }}
       </p>
       <form @submit.prevent="submitForm" v-if="student?.advisor?.id == null">

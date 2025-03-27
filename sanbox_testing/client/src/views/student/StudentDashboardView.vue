@@ -21,30 +21,23 @@ onMounted(fetchStudentAdvisor);
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-4 m-4">
-    <div class="lg:col-span-1">
+  <div class="container mx-auto p-4 m-5">
+    <div class="flex flex-col md:flex-row gap-4">
+      <!-- Profile Sidebar -->
       <StudentProfile />
-    </div>
-
-    <!-- Check if advisorId is not null -->
-    <div v-if="advisorId != null" class="lg:col-span-2">
+      <!-- Profile Content -->
+      <div class="w-full md:w-2/3 lg:w-3/4">
       <AnnouncementList />
-    </div>
-  </div>
-
-  <div v-if="advisorId != null" class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4 m-4">
-    <div class="lg:col-span-1">
       <AppointmentList />
-    </div>
-    <div v-if="advisorId != null" class="lg:col-span-1">
-      <Suspense>
-        <template #default>
-          <FeedbackStudentView />
-        </template>
-        <template #fallback>
-          <div>Loading feedback...</div>
-        </template>
-      </Suspense>
+        <Suspense>
+          <template #default>
+            <FeedbackStudentView />
+          </template>
+          <template #fallback>
+            <div>Loading feedback...</div>
+          </template>
+        </Suspense>
+      </div>
     </div>
   </div>
 </template>
