@@ -75,11 +75,14 @@ const fetchAppointments = async () => {
     loadingAppointments.value = true
     const advisorId = await AdvisorService.getAdvisorIdByUserId()
     const response = await AppointmentService.getAppointmentByAdvisorId(advisorId)
+    console.log('Fetched Appointments:', response.data) // ✅ ตรวจสอบข้อมูล API
     // appointments.value = response.data
     // กรองเฉพาะนัดหมายที่มี status.id === 2 (Pending)
+
     appointments.value = response.data.filter(
-      (appt: Appointment) => appt.status_appointment_id === 2
+      (appt: Appointment) => appt.status_appointment_id === 2 
     )
+    console.log('Filtered Appointments:', appointments.value) // ✅ ตรวจสอบข้อมูลหลังกรอง
   } catch (err) {
     appointmentError.value = 'Error fetching appointments: ' +
       (err instanceof Error ? err.message : 'Unknown error')
@@ -87,6 +90,8 @@ const fetchAppointments = async () => {
     loadingAppointments.value = false
   }
 }
+
+
 
 onMounted(async () => {
   await fetchAdvisors()

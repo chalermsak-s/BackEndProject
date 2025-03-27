@@ -19,9 +19,25 @@ const fetchAppointments = async () => {
         // appointments.value = response.data
 
         // กรองเฉพาะนัดหมายที่มี status.id === 2 (Pending)
+        // appointments.value = response.data.filter(
+        //     (appt: Appointment) => appt.status_appointment_id === 1
+        // )
+
+        // กรองเฉพาะนัดหมายที่มี status.id === 2 (Pending) และวันที่นัดหมายต้องไม่น้อยกว่าวันปัจจุบัน
+        // กรองเฉพาะนัดหมายที่มี status.id === 1 (Pending)
+        // และวันที่นัดหมายต้องไม่น้อยกว่าวันปัจจุบัน
+        const today = new Date()
+
         appointments.value = response.data.filter(
-            (appt: Appointment) => appt.status_appointment_id === 1
+            (appt: Appointment) =>
+                appt.status_appointment_id === 1 &&
+                new Date(appt.appointment_request_date) >= today
         )
+            .sort(
+                (a: Appointment, b: Appointment) =>
+                    new Date(a.appointment_request_date).getTime() -
+                    new Date(b.appointment_request_date).getTime()
+            )
 
     } catch (err) {
         error.value =
