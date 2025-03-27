@@ -79,6 +79,8 @@ onMounted(fetchStudent)
 </script>
 
 <template>
+  <div class="w-full md:w-1/3">
+
   <div class="card bg-white shadow-lg p-4 rounded-lg">
     <figure class="px-10 pt-10">
       <img :src="student?.picture || 'https://www.svgrepo.com/show/520490/student.svg'"
@@ -133,5 +135,6 @@ onMounted(fetchStudent)
         </RouterLink>
       </div>
     </div>
+  </div>
   </div>
 </template>

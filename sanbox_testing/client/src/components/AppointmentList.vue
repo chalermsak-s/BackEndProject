@@ -110,7 +110,7 @@ onMounted(fetchAppointments)
 </script>
 
 <template>
-  <div class="card bg-white shadow-lg p-4 rounded-lg">
+  <div class="card bg-white shadow-lg p-4 rounded-lg mb-4">
     <div class="card-body">
       <h2 class="text-xl font-semibold mb-4">รายการนัดหมาย</h2>
       <div class="card-actions justify-start m-3">
