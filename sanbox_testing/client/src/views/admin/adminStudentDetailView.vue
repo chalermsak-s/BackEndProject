@@ -48,26 +48,33 @@ const goBack = () => {
 }
 library.add(faRotateLeft)
 
-const imageExists = ref(false)
 
-
-const form = ref<any>({
-  advisor_id: '',
-})
-
+const form = ref<{ advisor_id: string }>({ advisor_id: '' })
 const loading = ref<boolean>(true)
 const error = ref<string | null>(null)
+  const imageExists = ref<boolean>(false)
 
 
 const submitForm = async () => {
-  const formData = new FormData()
+
+  if (!form.value.advisor_id) {
+    $swal.fire({
+      icon: 'warning',
+      title: 'โปรดเลือกที่ปรึกษา',
+    })
+    return
+  }
+
   const url = window.location.pathname;
   const parts = url.split("/");
   const studentId = parts[parts.length - 1]; // Get last 
   try {
-    const response = await apiClient.put(`/students/update/advisor/${studentId}`, formData)
+    const response = await apiClient.put(`/students/update/advisor/${studentId}`,
+      {
+        advisor_id: form.value.advisor_id,
+      }
+    )
     console.log('Success:', response.data)
-
     // Show success alert
     $swal.fire({
       icon: 'success',
@@ -76,18 +83,8 @@ const submitForm = async () => {
       timer: 1500,
     })
 
-    form.value = {
-      username: '',
-      password: '',
-      student_id_card: '',
-      first_name: '',
-      last_name: '',
-      file: null,
-      department_id: '',
-      degree_id: '',
-      advisor_id: '',
-    }
-    router.push('/')
+    form.value.advisor_id = ''
+    location.reload()
   } catch (error: any) {
     console.error('Error:', error.response?.data || error.message)
 
@@ -95,7 +92,7 @@ const submitForm = async () => {
     $swal.fire({
       icon: 'error',
       title: 'เกิดข้อผิดพลาด',
-      text: error.response?.data ? 'รหัสนักศึกษาถูกใช้งานแล้ว': error.response?.data || error.message,
+      text: error.response?.data ? 'รหัสนักศึกษาถูกใช้งานแล้ว' : error.response?.data || error.message,
     })
   }
 }
@@ -116,6 +113,9 @@ const fetchAdvisors = async () => {
 const advisors = ref<Advisor[]>([])
 onMounted(() => {
   fetchAdvisors()
+  if (student.value?.picture) {
+    imageExists.value = true
+  }
 })
 
 </script>
@@ -137,7 +137,7 @@ onMounted(() => {
         อาจารย์ที่ปรึกษา {{ student?.advisor?.first_name }}
         {{ student?.advisor?.last_name }}
       </p>
-      <form @submit.prevent="submitForm">
+      <form @submit.prevent="submitForm" v-if="student?.advisor?.id == null">
         <label class="input input-border flex max-w-none items-center gap-2 w-full require">
           <font-awesome-icon :icon="['fas', 'chalkboard-teacher']" class="h-4 w-4 opacity-70" />
           <select class="grow" v-model="form.advisor_id">

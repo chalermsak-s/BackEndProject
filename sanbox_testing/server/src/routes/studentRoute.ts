@@ -184,4 +184,15 @@ router.put('/:id', upload.single('file'), async (req: Request, res: Response) =>
   }
 })
 
+router.put('/update/advisor/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+  const advisor_id = parseInt(req.body.advisor_id)
+  const student = await studentService.updateAdvisorIdByStudentId(id,advisor_id)
+  if (student) {
+    res.json(student)
+  } else {
+    res.status(404).send('Student  not found')
+  }
+})
+
 export default router
