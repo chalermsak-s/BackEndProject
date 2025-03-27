@@ -9,11 +9,8 @@ export interface Announcement {
   advisor?: Advisor
 }
 
-export interface AnnouncementInsert {
+export interface InAnnouncement {
   topic: string
-  description?: string
+  description: string
   file?: string
-  posted_date: Date
-  advisor_id?: number
-  advisor?: Advisor
 }

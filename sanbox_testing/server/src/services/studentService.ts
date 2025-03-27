@@ -1,90 +1,64 @@
-// Description: This file contains the StudentService class, which provides methods to manage student data.
-// It includes methods to get all students, search for students, get a student by ID, update a student, and delete a student.
+import type { InStudent } from '../models/student'
+import * as studentRepository from '../repository/studentRepository'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
-import type { Student } from '../models/student';
-import { StudentRepository } from '../repository';
-import { BaseService } from './baseService';
-import { uploadFile } from './uploadFileService';
+export function getAllStudents() {
+  return studentRepository.getAllStudents()
+}
 
-export class StudentService extends BaseService {
-  private studentRepository: StudentRepository;
-  private bucket: string;
-  private filePath: string;
+export function getStudentById(id: number) {
+  return studentRepository.getStudentById(id)
+}
 
-  constructor() {
-    super();
-    this.studentRepository = new StudentRepository();
-    this.bucket = process.env.S3_BUCKET_NAME || 'advisor-system';
-    this.filePath = 'profiles';
-  }
+export function getStudentIdByUserId(id: number) {
+  return studentRepository.getStudentIdByUserId(id)
+}
 
-  // Get all students
-  async getAllStudents() {
-    try {
-      return await this.studentRepository.getAllStudents();
-    } catch (error) {
-      return this.handleError(error, 'Error retrieving all students');
-    }
-  }
+export function addStudent(newStudent: InStudent) {
+  const dataStudent = {
+    username: newStudent.username,
+    password: bcrypt.hashSync(newStudent.password),
+    student_id_card: newStudent.student_id_card,
+    first_name: newStudent.first_name,
+    last_name: newStudent.last_name,
+    picture: newStudent.picture,
+    department_id: newStudent.department_id,
+    degree_id: newStudent.degree_id,
+    advisor_id: newStudent.advisor_id
+  };
+  return studentRepository.addStudent(dataStudent)
+}
 
-  // Search students by name or ID
-  async searchStudents(query: string) {
-    try {
-      return await this.studentRepository.searchStudents(query);
-    } catch (error) {
-      return this.handleError(error, `Error searching students with query "${query}"`);
-    }
-  }
+export function updateStudentById(id:number,updatedStudent: InStudent) {
+  const dataStudent = {
+    username: updatedStudent.username,
+    password: bcrypt.hashSync(updatedStudent.password),
+    student_id_card: updatedStudent.student_id_card,
+    first_name: updatedStudent.first_name,
+    last_name: updatedStudent.last_name,
+    picture: updatedStudent.picture,
+    department_id: updatedStudent.department_id,
+    degree_id: updatedStudent.degree_id,
+    advisor_id: updatedStudent.advisor_id
+  };
+  return studentRepository.updateStudentById(id,dataStudent)
+}
 
-  // Get student by ID
-  async getStudentById(id: number) {
-    try {
-      return await this.studentRepository.getStudentById(id);
-    } catch (error) {
-      return this.handleError(error, `Error retrieving student with ID ${id}`);
-    }
-  }
+export async function getAllStudentPagination(
+  keyword: string,
+  pageSize: number,
+  pageNo: number
+) {
+  const pageStudents = await studentRepository.getAllStudentPagination(
+    keyword,
+    pageSize,
+    pageNo
+  )
+  return pageStudents
+}
 
-  // Create a new student
-  async createStudent(data: Student) {
-    try {
-      return await this.studentRepository.createStudent(data);
-    } catch (error) {
-      return this.handleError(error, 'Error creating student');
-    }
-  }
 
-  // Update student profile picture
-  async updateProfilePicture(studentId: number, file: Express.Multer.File) {
-    try {
-      // Upload the file to S3 and get the public URL
-      const imageUrl = await uploadFile(this.bucket, this.filePath, file);
-      
-      // Update the student record with the new image URL
-      const updatedStudent = await this.studentRepository.updateProfilePicture(studentId, imageUrl);
-      
-      return updatedStudent;
-    } catch (error) {
-      return this.handleError(error, `Error updating profile picture for student ID ${studentId}`);
-    }
-  }
-
-  // Update student information
-  async updateStudent(studentId: number, data: Partial<Student>) {
-    try {
-      return await this.studentRepository.updateStudent(studentId, data);
-    } catch (error) {
-      return this.handleError(error, `Error updating student with ID ${studentId}`);
-    }
-  }
-
-  // Delete student by ID
-  async deleteStudent(studentId: number) {
-    try {
-      await this.studentRepository.deleteStudent(studentId);
-      return { success: true, message: 'Student deleted successfully' };
-    } catch (error) {
-      return this.handleError(error, `Error deleting student with ID ${studentId}`);
-    }
-  }
+export function count() {
+  return studentRepository.countStudent()
 }

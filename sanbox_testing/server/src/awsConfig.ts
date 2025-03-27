@@ -1,5 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
-
+import dotenv from 'dotenv'
+dotenv.config();
 const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
 const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 const endpoint = process.env.SUPABASE_ENDPOINT_URL;

@@ -1,75 +1,50 @@
-// Description: This file contains the DepartmentRepository class, which interacts with the database to manage department data.
-// It includes methods to get all departments, get a department by ID, get all degrees, get a degree by ID, and get all academic positions.
-import { Prisma } from '@prisma/client';
-import type { Department } from '../models/department';
-import type { Degree } from '../models/degree';
-import type { AcademicPosition } from '../models/academicPosition';
-import prisma from './prisma-client';
+import { PrismaClient } from '@prisma/client'
+import type { Department } from '../models/department'
 
-export class DepartmentRepository {
-  // Get all departments
-  async getAllDepartments(): Promise<Department[]> {
-    try {
-      return await prisma.department.findMany();
-    } catch (error) {
-      console.error('Error retrieving all departments:', error);
-      throw error;
-    }
-  }
+const prisma = new PrismaClient()
 
-  // Get a department by ID
-  async getDepartmentById(id: number): Promise<Department | null> {
-    try {
-      return await prisma.department.findUnique({
-        where: { id }
-      });
-    } catch (error) {
-      console.error(`Error retrieving department with ID ${id}:`, error);
-      throw error;
-    }
-  }
-
-  // Get all degrees
-  async getAllDegrees(): Promise<Degree[]> {
-    try {
-      return await prisma.degree.findMany();
-    } catch (error) {
-      console.error('Error retrieving all degrees:', error);
-      throw error;
-    }
-  }
-
-  // Get a degree by ID
-  async getDegreeById(id: number): Promise<Degree | null> {
-    try {
-      return await prisma.degree.findUnique({
-        where: { id }
-      });
-    } catch (error) {
-      console.error(`Error retrieving degree with ID ${id}:`, error);
-      throw error;
-    }
-  }
-
-  // Get all academic positions
-  async getAllAcademicPositions(): Promise<AcademicPosition[]> {
-    try {
-      return await prisma.academic_position.findMany();
-    } catch (error) {
-      console.error('Error retrieving all academic positions:', error);
-      throw error;
-    }
-  }
-
-  // Get an academic position by ID
-  async getAcademicPositionById(id: number): Promise<AcademicPosition | null> {
-    try {
-      return await prisma.academic_position.findUnique({
-        where: { id }
-      });
-    } catch (error) {
-      console.error(`Error retrieving academic position with ID ${id}:`, error);
-      throw error;
-    }
-  }
+export function getAllDepartments() {
+  return prisma.department.findMany()
 }
+
+export function getDepartmentById(userId: number) {
+  return prisma.department.findUnique({
+    where: {
+      id: userId
+    },
+  })
+}
+
+export function getDepartmentByName(departmentName: string) {
+  return prisma.department.findMany({
+    where: {
+      department_name: {
+        contains: departmentName
+      },
+    },
+  });
+}
+
+export function addDepartment(newDepartment: Department) {
+  return prisma.department.create({
+    data: {
+      initials: newDepartment.initials || '',
+      department_name: newDepartment.department_name || ''
+    },
+  })
+}
+
+export async function updateDepartment(
+  departmentId: number,
+  updatedData: Partial<Department>
+) {
+  return await prisma.department.update({
+    where: { id: departmentId },
+    data: {
+      initials: updatedData.initials,
+      department_name: updatedData.department_name
+    },
+  })
+}
+
+

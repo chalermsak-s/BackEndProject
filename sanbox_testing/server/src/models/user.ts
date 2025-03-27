@@ -7,13 +7,13 @@ export interface User {
   id: number
   username: string
   password: string
-  // role: Role
+  role: Role
   admin_id: number | null
   student_id: number | null
   advisor_id: number | null
   admin: Admin | null
   student: Student | null
   advisor: Advisor | null
-  user_role?: UserRole | null
-  user_role_id?: number | null
+  UserRole: UserRole | null
+  userRoleId: number | null
 }

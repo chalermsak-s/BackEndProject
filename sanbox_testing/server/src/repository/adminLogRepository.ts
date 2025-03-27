@@ -1,90 +1,52 @@
-// Description: This file contains the AdminLogRepository class, which interacts with the database to manage admin logs.
-// It includes methods to create logs and retrieve logs by admin ID, student ID, or advisor ID.
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 
-import { Prisma } from '@prisma/client';
-import type { AdminLog } from '../models/adminLog';
-import prisma from './prisma-client';
-
-export class AdminLogRepository {
-  // Create a new admin log
-  async createLog(
-    action: string, 
-    adminId?: number, 
-    studentId?: number, 
-    advisorId?: number
-  ): Promise<AdminLog> {
-    try {
-      return await prisma.admin_log.create({
-        data: {
-          action,
-          admin_id: adminId,
-          student_id: studentId,
-          advisor_id: advisorId,
+export function getAllAdvisors() {
+  return prisma.admin_log.findMany({
+    select: {
+      id: true,
+      action: true,
+      log_date: true,
+      student_id: true,
+      advisor_id: true,
+      admin_id: true,
+      admin:{
+        select:{
+          name: true,
         }
-      });
-    } catch (error) {
-      console.error('Error creating admin log:', error);
-      throw error;
-    }
-  }
+      },
+      student:{
+        select:{
+          student_id_card: true,
+          first_name: true,
+          last_name: true,
+        }
+      },
+      advisor:{
+        select:{
+          first_name: true,
+          last_name: true,
+        }
+      }
+    },
+  })
+}
 
-  // Get logs by admin ID
-  async getLogsByAdminId(adminId: number): Promise<AdminLog[]> {
-    try {
-      return await prisma.admin_log.findMany({
-        where: { admin_id: adminId },
-        orderBy: {
-          log_date: 'desc'
+export function getAdvisorById(id: number) {
+  return prisma.advisor.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      first_name: true,
+      last_name: true,
+      academic_position: true,
+      department_id: true,
+      department: {
+        select: {
+          department_name: true,
+          initials: true,
         },
-        include: {
-          admin: true,
-          student: true,
-          advisor: true
-        }
-      });
-    } catch (error) {
-      console.error(`Error retrieving logs for admin ID ${adminId}:`, error);
-      throw error;
-    }
-  }
-
-  // Get logs by student ID
-  async getLogsByStudentId(studentId: number): Promise<AdminLog[]> {
-    try {
-      return await prisma.admin_log.findMany({
-        where: { student_id: studentId },
-        orderBy: {
-          log_date: 'desc'
-        },
-        include: {
-          admin: true,
-          student: true,
-          advisor: true
-        }
-      });
-    } catch (error) {
-      console.error(`Error retrieving logs for student ID ${studentId}:`, error);
-      throw error;
-    }
-  }
-
-  // Get logs by advisor ID
-  async getLogsByAdvisorId(advisorId: number): Promise<AdminLog[]> {
-    try {
-      return await prisma.admin_log.findMany({
-        where: { advisor_id: advisorId },
-        orderBy: {
-          log_date: 'desc'
-        },
-        include: {
-          admin: true,
-          student: true,
-          advisor: true
-        }
-      });
-    } catch (error) {
-      console.error(`Error retrieving logs for advisor ID ${advisorId}:`, error);
-      throw error;
-    }
-  }
+      },
+    },
+  })
 }

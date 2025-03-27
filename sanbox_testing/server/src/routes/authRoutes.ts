@@ -1,156 +1,104 @@
-import express, { Request, Response } from 'express';
-import { AuthService } from '../services';
-import { AuthMiddleware } from '../middleware';
-import { ApiResponse } from '../utils/response.util';
-import { ROLES } from '../utils/constants';
-import { body } from 'express-validator';
-import { validate } from '../middleware/validationMiddleware';
-import type { RegisterRequest } from '../models/registerRequest';
-import prisma from '../repository/prisma-client';
+import * as authService from '../services/authService'
+import * as authMiddleware from '../middleware/authMiddleware'
+import express, { Request, Response } from 'express'
+import type { user_role } from '@prisma/client'
+import type { RegisterRequest } from '../models/registerRequest'
 
+const router = express.Router()
 
-const router = express.Router();
-const authService = new AuthService();
-const authMiddleware = new AuthMiddleware();
+router.get('/me', authMiddleware.protect, async (req, res) => {
+  const user = req.body.user
+  res.status(200).json({
+    status: 'success',
+    user: {
+      id: user.id,
+      username: user.username,
+      user_role: user.user_role,
+    },
+  })
+})
 
-router.post('/authenticate', 
-  [
-    body('username').notEmpty().withMessage('Username is required'),
-    body('password').notEmpty().withMessage('Password is required')
-  ],
-  validate,
-  async (req: Request, res: Response) => {
-    const { username, password } = req.body;
-    
-    try {
-      const user = await authService.findByUsername(username);
-      
-      if (!user) {
-          return ApiResponse.error(res, "User doesn't exist", 401);
-      }
-      
-      if (user.password === undefined || user.password === null) {
-          return ApiResponse.error(res, "Password is required", 400);
-      }
-      
-      const isPasswordCorrect = await authService.comparePassword(password, user.password);
-      
-      if (!isPasswordCorrect) {
-          return ApiResponse.error(res, "Invalid credentials", 401);
-      }
-      
-      const token = authService.generatetoken(user.id);
-      const userRoleData = await prisma.user_role.findUnique({
-        where: { id: user.user_role_id || 0 }
-      });
-      const role = userRoleData?.role_name || 'unknown';
-      
-      return ApiResponse.success(res, {
-        access_token: token,
-        user: {
-          id: user.id,
-          username: user.username,
-          role: role,
-          studentId: user.student_id,
-          advisorId: user.advisor_id,
-          adminId: user.admin_id
-        }
-      }, 'Authentication successful');
-    } catch (error) {
-        return ApiResponse.error(res, "Authentication failed", 500, error);
-    }
-});
+router.post('/authenticate', async (req, res) => {
+  const { username, password } = req.body
+  const user = await authService.findByUsername(username)
+  if (!user) {
+    res.status(401).json({ message: "User doesn't exist" })
+    return
+  }
 
-router.post('/admin', 
-  authMiddleware.protect, 
-  authMiddleware.isAdmin, 
-  async (req: Request, res: Response) => {
-    return ApiResponse.success(res, null, 'You are an admin');
-});
+  if (!password || !user.password) {
+    res.status(400).json({ message: 'Password is required' })
+    return
+  }
 
-router.post('/register', 
-  [
-    body('username').notEmpty().withMessage('Username is required'),
-    body('password').notEmpty().withMessage('Password is required')
-      .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('roleId').isInt().withMessage('Role ID must be an integer')
-  ],
-  validate,
-  async (req: Request, res: Response) => {
-    const registerRequest: RegisterRequest = req.body;
-    
-    try {
-      const { username, password, user_role_id } = registerRequest;
-      const responseUser = await authService.registerUser(username, password, user_role_id);
-      
-      const responseUserRoleData = await prisma.user_role.findUnique({
-        where: { id: responseUser.user_role_id || 0 }
-      });  
-      return ApiResponse.success(res, {
-          id: responseUser.id,
-          username: responseUser.username,
-          role: responseUserRoleData?.role_name || 'unknown'
-      }, 'User registered successfully', 201);
-    } catch (error) {
-        return ApiResponse.error(res, 'Registration failed', 500, error);
-    }
-});
+  const isPasswordCorrect = await authService.comparePassword(
+    password,
+    user.password
+  )
+  if (!isPasswordCorrect) {
+    res.status(401).json({ message: 'Invalid credentials' })
+    return
+  }
 
-router.get('/me', 
-  authMiddleware.protect, 
-  async (req: Request, res: Response) => {
-    try {
-      const userId = req.user?.id;
-      
-      if (!userId) {
-          return ApiResponse.error(res, "User not authenticated", 401);
-      }
-      
-      const user = await authService.findByUserId(userId);
-      
-      if (!user) {
-          return ApiResponse.error(res, "User not found", 404);
-      }
-      
-      const userRoleData = await prisma.user_role.findUnique({
-        where: { id: user.user_role_id || 0 }
-      });
-        
-      return ApiResponse.success(res, {
-          id: user.id,
-          username: user.username,
-          role: userRoleData?.role_name || 'unknown',
-          studentId: user.student_id,
-          advisorId: user.advisor_id,
-          adminId: user.admin_id
-      }, 'User information retrieved successfully');
-    } catch (error) {
-        return ApiResponse.error(res, "Failed to get user", 500, error);
-    }
-});
+  const token = authService.generatetoken(user.id)
+  res.status(200).json({
+    status: 'success',
+    access_token: token,
+    user: {
+      id: user.id,
+      username: user.username || 'unknown',
+      role: user.user_role ? user.user_role.role_name : 'unknown',
+    },
+  })
+  return
+})
 
-router.post('/update-password', 
+router.post(
+  '/checkRole',
   authMiddleware.protect,
-  [
-    body('password').notEmpty().withMessage('Password is required')
-      .isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-  ],
-  validate,
+  authMiddleware.checkRole,
   async (req: Request, res: Response) => {
-    try {
-        const userId = req.user?.id;
-        const { password } = req.body;
-        
-        if (!userId) {
-            return ApiResponse.error(res, "User not authenticated", 401);
-        }
-        
-        await authService.updatePassword(userId, password);
-        
-        return ApiResponse.success(res, null, "Password updated successfully");
-    } catch (error) {
-        return ApiResponse.error(res, "Failed to update password", 500, error);
-    }  
-});
+    res.status(200).json({
+      status: 'success',
+      message: 'You are an authen',
+    })
+  }
+)
 
-export default router;
+router.post('/register', async (req, res) => {
+  const registerRequest: RegisterRequest = req.body
+  try {
+    const responseUser = await authService.registerAdmin(registerRequest)
+    res.status(201).json({
+      status: 'success',
+      user: {
+        id: responseUser.id,
+        username: responseUser.username,
+        role: responseUser ? responseUser.user_role_id : 'unknown',
+      },
+    })
+  } catch (error) {
+    res.status(500).json({ status: 'error', message: 'Internal server error' })
+  }
+})
+
+router.post('/updatePassword', authMiddleware.protect, async (req, res) => {
+  const user = req.body.user
+  const { password } = req.body
+  try {
+    await authService.updatePassword(user.id, password)
+    res.status(200).json({
+      status: 'success',
+      user: {
+        id: user.id,
+        username: user.username,
+        roles: user.roles.map((role: user_role) => role.role_name),
+      },
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ status: 'error', message: 'Internal server error' })
+  }
+})
+
+export default router

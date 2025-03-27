@@ -1,163 +1,98 @@
-import express, { Request, Response } from 'express';
-import { AnnouncementService } from '../services';
-import { AuthMiddleware } from '../middleware';
-import { uploadAnnouncementFile } from '../middleware/uploadMiddleware';
-import { ApiResponse } from '../utils/response.util';
-import { ROLES } from '../utils/constants';
-import { param, body } from 'express-validator';
-import { validate } from '../middleware/validationMiddleware';
-import path from 'path';
+import express, { Request, Response } from 'express'
+import * as announcementService from '../services/announcementService'
+import { uploadFile } from '../services/uploadFileService'
+import multer from 'multer'
+import dotenv from 'dotenv'
+import type { InAnnouncement } from '../models/announcement'
 
-const router = express.Router();
-const announcementService = new AnnouncementService();
-const authMiddleware = new AuthMiddleware();
+const upload = multer({ storage: multer.memoryStorage() });
+const router = express.Router()
+dotenv.config();
 
-router.post('/', 
-  authMiddleware.protect, 
-  authMiddleware.isAdvisor, 
-  uploadAnnouncementFile,
-  [
-    body('topic').notEmpty().withMessage('Topic is required'),
-    body('description').notEmpty().withMessage('Description is required')
-  ],
-  validate,
-  async (req: Request, res: Response) => {
-    try {
-      const advisorId = req.user?.advisorId;
-      const { topic, description } = req.body;
-      
-      if (!advisorId) {
-        return ApiResponse.error(res, 'Advisor ID is required', 400);
-      }
-      
-      const announcement = await announcementService.createAnnouncement(
-        advisorId,
-        topic,
-        description,
-        req.file
-      );
-      
-      return ApiResponse.success(res, announcement, 'Announcement created successfully', 201);
-    } catch (error) {
-      return ApiResponse.error(res, 'Failed to create announcement', 500, error);
+router.get('/', async (req: Request, res: Response) => {
+    res.json(await announcementService.getAllAnnouncements())
+})
+
+router.get('/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+    const announcement = await announcementService.getAnnouncementById(id)
+    if (announcement) {
+      res.json(announcement)
+    } else {
+      res.status(404).send('Announcement not found')
+    }
+})
+
+router.get('/advisor-id-by-student-id/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+    const getAnnouncementByStudentId = await announcementService.getAnnouncementByStudentId(id)
+    if (getAnnouncementByStudentId) {
+      res.json(getAnnouncementByStudentId)
+    } else {
+      res.status(404).send('Announcement studentId to advisorId not found')
+    }
+})
+
+router.get('/announcement-advisor/:id', async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+    const getAnnouncementAdvisor = await announcementService.getAnnouncementByAdvisorId(id)
+    if (getAnnouncementAdvisor) {
+      res.json(getAnnouncementAdvisor)
+    } else {
+      res.status(404).send('Announcement of this advisor not found')
+    }
+})
+
+router.post('/announcement-advisor/:id', upload.single('file'), async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id)
+  try {
+    // รับไฟล์จาก req.file
+    const file = req.file;
+    if (!file) {
+      return res.status(400).send('No file uploaded.');
+    }
+
+    const bucket = process.env.SUPABASE_BUCKET_NAME;
+    const filePath = process.env.UPLOAD_DIR;
+
+    // ตรวจสอบการตั้งค่าของ bucket และ file path
+    if (!bucket || !filePath) {
+      return res.status(500).send('Bucket name or file path not configured.');
+    }
+
+    // เรียกฟังก์ชัน uploadFile เพื่ออัปโหลดไฟล์ไปยัง Supabase และรับ URL
+    const ouputUrl = await uploadFile(bucket, filePath, file);
+
+    // รับข้อมูลจาก req.body
+    const newAnnouncement: InAnnouncement = req.body;
+
+    // ตรวจสอบว่า req.body มีค่าหรือไม่
+    if (!newAnnouncement) {
+      return res.status(400).json({ error: 'Invalid request body' });
+    }
+
+    // เตรียมข้อมูล student สำหรับเพิ่ม
+    const topic = req.body.topic
+    const description = req.body.description
+    const picture = ouputUrl
+
+
+    // เรียก service เพื่อเพิ่มข้อมูลนักศึกษา
+    const result = await announcementService.addAnnouncementByAdvisorId(id, topic, description, picture);
+
+    // ส่งข้อมูลที่เพิ่มสำเร็จกลับไป
+    res.status(201).json(result);
+  } catch (error) {
+    console.error('Error adding advisor:', error);
+
+    // ตรวจสอบ error ที่เกิดขึ้น และส่ง response ตามกรณี
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: 'An unexpected error occurred' });
     }
   }
-);
+});
 
-router.get('/:id', 
-  authMiddleware.protect,
-  [
-    param('id').isInt().withMessage('Announcement ID must be an integer')
-  ],
-  validate,
-  async (req: Request, res: Response) => {
-    try {
-      const announcementId = parseInt(req.params.id);
-      const announcement = await announcementService.getAnnouncementById(announcementId);
-      
-      if (!announcement) {
-        return ApiResponse.error(res, 'Announcement not found', 404);
-      }
-      
-      return ApiResponse.success(res, announcement, 'Announcement fetched successfully');
-    } catch (error) {
-      return ApiResponse.error(res, 'Failed to fetch announcement', 500, error);
-    }
-  }
-);
 
-router.get('/advisor/:advisorId', 
-  authMiddleware.protect,
-  [
-    param('advisorId').isInt().withMessage('Advisor ID must be an integer')
-  ],
-  validate,
-  async (req: Request, res: Response) => {
-    try {
-      const advisorId = parseInt(req.params.advisorId);
-      const announcements = await announcementService.getAnnouncementsByAdvisorId(advisorId);
-      return ApiResponse.success(res, announcements, 'Announcements fetched successfully');
-    } catch (error) {
-      return ApiResponse.error(res, 'Failed to fetch announcements', 500, error);
-    }
-  }
-);
-
-router.get('/student/:studentId', 
-  authMiddleware.protect,
-  [
-    param('studentId').isInt().withMessage('Student ID must be an integer')
-  ],
-  validate,
-  async (req: Request, res: Response) => {
-    try {
-      const studentId = parseInt(req.params.studentId);
-      
-      // Check permissions
-      if (
-        req.user?.role !== ROLES.ADMIN && 
-        !(req.user?.role === ROLES.STUDENT && req.user.studentId === studentId) &&
-        !(req.user?.role === ROLES.ADVISOR && req.user.advisorId)
-      ) {
-        return ApiResponse.error(res, 'Insufficient permissions', 403);
-      }
-      
-      const announcements = await announcementService.getAnnouncementsForStudent(studentId);
-      return ApiResponse.success(res, announcements, 'Announcements fetched successfully');
-    } catch (error) {
-      return ApiResponse.error(res, 'Failed to fetch announcements', 500, error);
-    }
-  }
-);
-
-router.delete('/:id', 
-  authMiddleware.protect, 
-  authMiddleware.isAdvisor,
-  [
-    param('id').isInt().withMessage('Announcement ID must be an integer')
-  ],
-  validate,
-  async (req: Request, res: Response) => {
-    try {
-      const announcementId = parseInt(req.params.id);
-      const advisorId = req.user?.advisorId;
-      
-      if (!advisorId) {
-        return ApiResponse.error(res, 'Advisor ID is required', 400);
-      }
-      
-      // Check if announcement belongs to this advisor
-      const announcement = await announcementService.getAnnouncementById(announcementId);
-      
-      if (!announcement) {
-        return ApiResponse.error(res, 'Announcement not found', 404);
-      }
-      
-      if (announcement.advisor_id !== advisorId) {
-        return ApiResponse.error(res, 'You can only delete your own announcements', 403);
-      }
-      
-      await announcementService.deleteAnnouncement(announcementId);
-      return ApiResponse.success(res, null, 'Announcement deleted successfully');
-    } catch (error) {
-      return ApiResponse.error(res, 'Failed to delete announcement', 500, error);
-    }
-  }
-);
-
-router.get('/file/:filename', 
-  authMiddleware.protect, 
-  async (req: Request, res: Response) => {
-    try {
-      // Since we're now using S3 storage, we need to redirect to the file URL
-      // instead of serving it from the local filesystem
-      const filename = req.params.filename;
-
-      return ApiResponse.error(res, 'Direct file downloads are not supported with S3 storage. Please use the file URL.', 400);
-    } catch (error) {
-      return ApiResponse.error(res, 'Failed to download file', 500, error);
-    }
-  }
-);
-
-export default router;
+export default router

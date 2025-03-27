@@ -1,0 +1,14 @@
+### Mock List
+GET https://6586e0af468ef171392ee7fa.mockapi.io/todos HTTP/1.1
+
+###  Mock Add
+POST https://6586e0af468ef171392ee7fa.mockapi.io/todos HTTP/1.1
+content-type: application/json
+
+{
+    "message": "Hello",
+    "name": "OK",
+    "status": "Status 1",
+}
+
+

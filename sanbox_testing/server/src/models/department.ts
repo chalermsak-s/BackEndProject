@@ -4,6 +4,6 @@ export interface Department {
   id: number
   initials: string | null
   department_name: string
-  students?: Student[]
-  advisors?: Advisor[]
+  students: Student[]
+  advisors: Advisor[]
 }

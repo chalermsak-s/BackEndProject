@@ -13,6 +13,10 @@ export interface Admin {
   feedback: Feedback[]
 }
 
+export interface FeedbackState {
+  feedback: Feedback | null
+}
+
 export interface AdminLog {
   id: number
   action?: string

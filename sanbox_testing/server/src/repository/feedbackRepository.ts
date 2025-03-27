@@ -1,191 +1,116 @@
-// Description: This file contains the FeedbackRepository class, which interacts with the database to manage feedback data.
-// It includes methods to create, read, and retrieve feedback between students and advisors.
+import { PrismaClient } from '@prisma/client'
+import type { InsFeedback } from '../models/feedback'
+const prisma = new PrismaClient()
 
-import { Prisma } from '@prisma/client';
-import type { Feedback } from '../models/feedback';
-import prisma from './prisma-client';
-
-export class FeedbackRepository {
-  // Create a new feedback
-  async createFeedback(feedbackData: Feedback): Promise<Feedback> {
-    try {
-      return await prisma.feedback.create({
-        data: feedbackData,
-      });
-    } catch (error) {
-      console.error('Error creating feedback:', error);
-      throw error;
-    }
-  }
-
-  // Get feedback by ID
-  async getFeedbackById(id: number): Promise<Feedback | null> {
-    try {
-      return await prisma.feedback.findUnique({
-        where: { id },
-        include: {
-          student: true,
-          advisor: true,
+export function getAllFeedbacks() {
+  return prisma.feedback.findMany({
+    select: {
+      id: true,
+      feedback: true,
+      timestamp: true,
+      student_id: true,
+      advisor_id: true,
+      admin_id: true,
+      responder_id: true,
+      student: {
+        select: {
+          student_id_card: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
+      advisor: {
+        select: {
+          first_name: true,
+          last_name: true,
+        },
+      },
+      responder: {
+        select: {
           responder: true,
-          admin: true,
-          replies: true,
-          parent_feedback: true,
-        }
-      });
-    } catch (error) {
-      console.error(`Error retrieving feedback with ID ${id}:`, error);
-      throw error;
-    }
-  }
+        },
+      },
+    },
+  })
+}
 
-  // Get feedback conversation between student and advisor
-  async getFeedbackConversation(studentId: number, advisorId: number): Promise<Feedback[]> {
-    try {
-      return await prisma.feedback.findMany({
-        where: {
-          student_id: studentId,
-          advisor_id: advisorId,
-          parent_feedback_id: null // Only top-level messages
+export function getFeedbackById(id: number) {
+  return prisma.feedback.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      feedback: true,
+      timestamp: true,
+      student_id: true,
+      advisor_id: true,
+      admin_id: true,
+      responder_id: true,
+      student: {
+        select: {
+          student_id_card: true,
+          first_name: true,
+          last_name: true,
         },
-        orderBy: {
-          timestamp: 'asc'
+      },
+      advisor: {
+        select: {
+          first_name: true,
+          last_name: true,
         },
-        include: {
-          student: true,
-          advisor: true,
+      },
+      responder: {
+        select: {
           responder: true,
-          admin: true,
-          replies: {
-            include: {
-              student: true,
-              advisor: true,
-              responder: true,
-              admin: true,
-              replies: true
-            }
-          }
-        }
-      });
-    } catch (error) {
-      console.error(`Error retrieving feedback conversation between student ${studentId} and advisor ${advisorId}:`, error);
-      throw error;
-    }
-  }
+        },
+      },
+    },
+  })
+}
 
-  // Get Advisor feedbacks 
-  async getAdvisorFeedbacks(advisorId: number): Promise<Feedback[]> {
-    try {
-      return await prisma.feedback.findMany({
-        where: {
-          advisor_id: advisorId,
-          parent_feedback_id: null // Only top-level messages
+export function getFeedbackByStudentId(id: number) {
+  return prisma.feedback.findMany({
+    where: { student_id: id },
+    select: {
+      id: true,
+      feedback: true,
+      timestamp: true,
+      student_id: true,
+      advisor_id: true,
+      admin_id: true,
+      responder_id: true,
+      student: {
+        select: {
+          student_id_card: true,
+          first_name: true,
+          last_name: true,
         },
-        include: {
-          student: {
-            select: {
-              id: true,
-              first_name: true,
-              last_name: true,
-              student_id_card: true,
-              picture: true
-            }
-          },
+      },
+      advisor: {
+        select: {
+          first_name: true,
+          last_name: true,
+        },
+      },
+      responder: {
+        select: {
           responder: true,
-          replies: {
-            include: {
-              student: true,
-              advisor: true,
-              responder: true,
-              admin: true
-            }
-          }
         },
-        orderBy: {
-          timestamp: 'desc'
-        }
-      });
-    } catch (error) {
-      console.error(`Error retrieving feedbacks for advisor ID ${advisorId}:`, error);
-      throw error;
-    }
-  }
+      },
+    },
+    orderBy: {
+      timestamp: 'desc',
+    },
+  })
+}
 
-  // Get Student feedbacks
-  async getStudentFeedbacks(studentId: number): Promise<Feedback[]> {
-    try {
-      return await prisma.feedback.findMany({
-        where: {
-          student_id: studentId,
-          parent_feedback_id: null // Only top-level messages
-        },
-        include: {
-          advisor: {
-            select: {
-              id: true,
-              first_name: true,
-              last_name: true,
-              picture: true,
-              academic_position: true
-            }
-          },
-          responder: true,
-          replies: {
-            include: {
-              student: true,
-              advisor: true,
-              responder: true,
-              admin: true
-            }
-          }
-        },
-        orderBy: {
-          timestamp: 'desc'
-        }
-      });
-    } catch (error) {
-      console.error(`Error retrieving feedbacks for student ID ${studentId}:`, error);
-      throw error;
+export function addFeedbackByAdvisor(newFeedback: InsFeedback) {
+  return prisma.feedback.create({
+    data: {
+      feedback: newFeedback.feedback,
+      timestamp: newFeedback.timestamp,
+      student_id: newFeedback.student_id,
+      advisor_id: newFeedback.advisor_id,
+      responder_id: newFeedback.responder_id
     }
-  }
-
-  // Add a reply to an existing feedback
-  async addReply(replyData: Omit<Feedback, 'id'>): Promise<Feedback> {
-    try {
-      return await prisma.feedback.create({
-        data: replyData,
-        include: {
-          student: true,
-          advisor: true,
-          responder: true,
-          admin: true
-        }
-      });
-    } catch (error) {
-      console.error('Error adding reply to feedback:', error);
-      throw error;
-    }
-  }
-
-  // Get all replies to a feedback
-  async getFeedbackReplies(feedbackId: number): Promise<Feedback[]> {
-    try {
-      return await prisma.feedback.findMany({
-        where: {
-          parent_feedback_id: feedbackId
-        },
-        include: {
-          student: true,
-          advisor: true,
-          responder: true,
-          admin: true
-        },
-        orderBy: {
-          timestamp: 'asc'
-        },
-      });
-    } catch (error) {
-      console.error(`Error retrieving replies for feedback ID ${feedbackId}:`, error);
-      throw error;
-    }
-  }
+  })
 }
