@@ -323,7 +323,7 @@ onMounted(() => {
                 </option>
               </select>
             </label>
-            <label class="input input-border flex max-w-none items-center gap-2 w-full required hidden">
+            <label class="input input-border max-w-none items-center gap-2 w-full required hidden">
               <font-awesome-icon :icon="['fas', 'chalkboard-teacher']" class="h-4 w-4 opacity-70" />
               <select v-model="form.advisor_id" class="grow">
                 <option value="" disabled>เลือกที่ปรึกษา</option>
