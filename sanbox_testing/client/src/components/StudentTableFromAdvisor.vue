@@ -6,7 +6,7 @@ import type { Student } from "@/types";
 const students = ref<Student[]>([]);
 const loading = ref<boolean>(true);
 const error = ref<string | null>(null);
-const searchQuery = ref<string>(""); // ✅ เพิ่มตัวแปรสำหรับค้นหา
+const searchQuery = ref<string>(""); // เพิ่มตัวแปรสำหรับค้นหา
 
 const fetchStudents = async () => {
   try {
@@ -36,7 +36,7 @@ const filteredStudents = computed(() => {
 
 // ใช้ข้อมูลที่ถูกกรองแทนที่ students
 const currentStduentPage = ref(1);
-const pageStudentSize = 3;
+const pageStudentSize = 5;
 
 const totalStudentPages = computed(() =>
   Math.ceil(filteredStudents.value.length / pageStudentSize)
