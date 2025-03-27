@@ -23,7 +23,7 @@ interface Feedback {
     responder: Responder
 }
 
-const typedFeedback = ref<Feedback | null>(null) 
+const typedFeedback = ref<Feedback | null>(null)
 const student_id = await StudentService.getStudentIdByUserId()
 const advisor_id = await StudentService.getAdvisorIdByUserId()
 
@@ -82,7 +82,7 @@ const submitForm = async () => {
         // Show success alert
         const responseNew = await FeedbackService.getFeedbackByStudentId(student_id)
         typedFeedback.value = responseNew.data
-        
+
         form.value = {
             message: '',
             student_id: 0,
@@ -114,8 +114,8 @@ const submitForm = async () => {
                         <div class="chat-image avatar">
                             <div class="w-10 rounded-full">
                                 <!-- v-html="UtilService.displayFileFromURL(announcement?.file || '').html" -->
-                                <img alt="Tailwind CSS chat bubble component" 
-                                    src="https://www.svgrepo.com/show/520490/student.svg" />
+                                <img :src="item.student?.picture || 'https://www.svgrepo.com/show/520490/student.svg'"
+                                    :alt="item.student?.picture ? 'รูปนักศึกษา' : 'Student Avatar'" class="object-cover" />
                             </div>
                         </div>
                         <div class="chat-header">
@@ -129,8 +129,8 @@ const submitForm = async () => {
                     <div class="chat chat-start" v-if="item.responder_id === 2">
                         <div class="chat-image avatar">
                             <div class="w-10 rounded-full">
-                                <img alt="Tailwind CSS chat bubble component"
-                                    src="https://www.svgrepo.com/show/240382/teacher.svg" />
+                                <img :src="item.advisor?.picture || 'https://dev.kumawork.com/project_images_backend/advisor.png'"
+                                    :alt="item.advisor?.picture ? 'รูปอาจารย์' : 'Teacher Avatar'" class="object-cover" />
                             </div>
                         </div>
                         <div class="chat-header">
