@@ -1,53 +1,44 @@
 import express, { Request, Response } from 'express'
 import dotenv from 'dotenv'
-import cors from "cors";
-import multer from 'multer';
-import routes from './routes';
-import { uploadFile } from './services/uploadFileService';
+import cors from 'cors'
+import studentRoute from './routes/studentRoute'
+import authRoutes from './routes/authRoutes'
+import advisorRoutes from './routes/advisorRoutes'
+import departmentRoutes from './routes/departmentRoutes'
+import degreeRoutes from './routes/degreeRoutes'
+import appointmentRoutes from './routes/appointmentRoutes'
+import announcementRoutes from './routes/announcementRoutes'
+import feedbackRoutes from './routes/feedbackRoutes'
+import academicPositionRoutes from './routes/academicPositionRoutes'
+import statusAppointmentRoutes from './routes/statusAppointmentRoutes'
 
+
+const port = process.env.PORT || 3000
 dotenv.config()
-
-const PORT = process.env.PORT || 3000
 const app = express()
-
-const allowedOrigins = ['http://localhost:5173', 'https://713-2024-frontend-example-one.vercel.app'];
-const options: cors.CorsOptions = { origin: allowedOrigins};
 
 app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use('/api', routes);
+
+app.use('/students', studentRoute)
+app.use('/auth', authRoutes)
+app.use('/advisors', advisorRoutes)
+app.use('/departments', departmentRoutes)
+app.use('/degrees', degreeRoutes)
+app.use('/appointments', appointmentRoutes)
+app.use('/announcements', announcementRoutes)
+app.use('/feedbacks', feedbackRoutes)
+app.use('/academicpositions', academicPositionRoutes)
+app.use('/statusappointments', statusAppointmentRoutes)
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!')
+  res.json({
+    status: 'success',
+    message: 'Welcome to the Backend API!',
+    timestamp: new Date().toISOString(),
+  })
 })
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
+app.listen(port, () => {
+  console.log(`App listening at http://localhost:${port}`)
 })
-
-const upload = multer({ storage: multer.memoryStorage() });
-
-app.post('/upload', upload.single('file'), async (req: any, res: any) => {
-  try {
-    const file = req.file;
-
-    if (!file) {
-      return res.status(400).send('No file uploaded.');
-    }
-    
-    const bucket = process.env.SUPABASE_BUCKET_NAME;
-    const filePath = process.env.UPLOAD_DIR;
-    
-    if (!bucket || !filePath) {
-      return res.status(500).send('Bucket name or file path not configured.');
-    }
-    
-    const ouputUrl = await uploadFile(bucket, filePath, file);
-    
-    res.status(200).send(ouputUrl);
-  } catch (error) {
-    res.status(500).send('Error uploading file.');
-  }
-});
-

@@ -1,18 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient,role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-enum Role {
-  Admin = 'Admin',
-  Advisor = 'Advisor',
-  Student = 'Student',
-}
 // ข้อมูลสิทธิ์ผู้ใช้
 export async function createUserRoles() {
   const userroles = [
-    { role_name: Role.Admin },
-    { role_name: Role.Advisor },
-    { role_name: Role.Student }
+    { role_name: role.Admin },
+    { role_name: role.Advisor },
+    { role_name: role.Student }
   ];
 
   console.log("เริ่มสร้างข้อมูลสิทธิ์ผู้ใช้...");

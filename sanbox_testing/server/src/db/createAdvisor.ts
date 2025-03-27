@@ -1,6 +1,6 @@
 import { PrismaClient} from '@prisma/client'
 import bcrypt from 'bcryptjs'
-// Removed incorrect import as 'role' is not exported from the specified module
+import { role } from '../../node_modules/.prisma/client/index.d';
 const prisma = new PrismaClient()
 const numSaltAround = 10
 

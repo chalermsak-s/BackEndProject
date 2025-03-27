@@ -39,7 +39,9 @@ import StudentDetailView from '@/views/student/StudentDetailView.vue'
 import StudentDashboardView from '@/views/student/StudentDashboardView.vue'
 import StudentEditProfileView from '@/views/student/StudentEditProfileView.vue'
 import StudentAddAppointmentView from '@/views/student/StudentAddAppointmentView.vue'
+import StudentAnnouncementsDetailView from '@/views/student/StudentAnnouncementsDetailView.vue'
 import StudentAppointmentDetailView from '@/views/student/StudentAppointmentDetailView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -492,41 +494,6 @@ const router = createRouter({
       },
     },
     {
-      path: '/student/detail/announcement/:id',
-      name: 'student-announcement-detail-view',
-      component: adminAnnouncementsDetailView,
-      props: true,
-      beforeEnter: async (to: any) => {
-        const authStore = useAuthStore()
-        if (!authStore.isStudent) {
-          return {
-            name: '404-resource-view',
-            params: { resource: 'you-are-not-allowed-to-access' },
-          }
-        } else {
-          const id = Number(to.params.id) // ป้องกัน NaN
-          if (isNaN(id)) {
-            return {
-              name: '404-resource-view',
-              params: { resource: 'appointment' },
-            }
-          }
-          const announcementStore = useAnnouncementStore()
-          try {
-            const response = await AnnouncementService.getAnnouncement(id)
-            announcementStore.setStore(response.data)
-            return true // อนุญาตให้ไปต่อ
-          } catch (error: any) {
-            console.error('Fetch Announcement Error:', error) // เพิ่ม log สำหรับ debug
-            const status = error.response?.status
-            return status === 404
-              ? { name: '404-resource-view', params: { resource: 'announcement' } }
-              : { name: 'network-error-view' }
-          }
-        }
-      },
-    },
-    {
       path: '/student/add/appointment',
       name: 'student-add-appointment-view',
       component: StudentAddAppointmentView,
@@ -554,6 +521,41 @@ const router = createRouter({
     {
       path: '/student/announcement/detail/:id',
       name: 'student-announcement-detail-view',
+      component: StudentAnnouncementsDetailView,
+      props: true,
+      beforeEnter: async (to: any) => {
+        const authStore = useAuthStore()
+        if (!authStore.isStudent) {
+          return {
+            name: '404-resource-view',
+            params: { resource: 'you-are-not-allowed-to-access' },
+          }
+        } else {
+          const id = Number(to.params.id) // ป้องกัน NaN
+          if (isNaN(id)) {
+            return {
+              name: '404-resource-view',
+              params: { resource: 'announcement' },
+            }
+          }
+          const announcementStore = useAnnouncementStore()
+          try {
+            const response = await AnnouncementService.getAnnouncement(id)
+            announcementStore.setStore(response.data)
+            return true // อนุญาตให้ไปต่อ
+          } catch (error: any) {
+            console.error('Fetch Announcement Error:', error) // เพิ่ม log สำหรับ debug
+            const status = error.response?.status
+            return status === 404
+              ? { name: '404-resource-view', params: { resource: 'announcement' } }
+              : { name: 'network-error-view' }
+          }
+        }
+      },
+    },
+    {
+      path: '/student/appointment/detail/:id',
+      name: 'student-appointment-detail-view',
       component: StudentAppointmentDetailView,
       props: true,
       beforeEnter: async (to: any) => {
@@ -585,7 +587,7 @@ const router = createRouter({
           }
         }
       },
-    },
+    }
     /* Student End */
   ],
 

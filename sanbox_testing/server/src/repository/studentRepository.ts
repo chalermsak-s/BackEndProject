@@ -1,144 +1,183 @@
-// Description: Student repository for managing student data in the database.
-// This file contains methods to create, read, update, and delete student records.
-// It also includes methods to search for students by various criteria and to get all students with their related data.
+import { PrismaClient } from '@prisma/client'
+import type { PageStudent, InStudent } from '../models/student'
 
-import { Prisma } from '@prisma/client';
-import type { Student } from '../models/student';
-import prisma from './prisma-client';
+const prisma = new PrismaClient()
 
-export class StudentRepository {
-  
-  // Create a new student
-  async createStudent(studentData: Student): Promise<Student> {
-    try {
-      return await prisma.student.create({ data: studentData });
-    } catch (error) {
-      console.error('Error creating student:', error);
-      throw error;
-    }
-  }
-
-  // Get student by user ID
-  async getStudentByUserId(userId: number): Promise<Student | null> {
-    try {
-      return await prisma.student.findFirst({ 
-        where: { users: { some: { id: userId } } } 
-      });
-    } catch (error) {
-      console.error(`Error retrieving student with user ID ${userId}:`, error);
-      throw error;
-    }
-  }
-
-  // Get student by student ID card
-  async getStudentByIdCard(studentIdCard: string): Promise<Student | null> {
-    try {
-      return await prisma.student.findUnique({ where: { student_id_card: studentIdCard } });
-    } catch (error) {
-      console.error(`Error retrieving student with ID card ${studentIdCard}:`, error);
-      throw error;
-    }
-  }
-
-  // Get student by ID
-  async getStudentById(id: number): Promise<Student | null> {
-    try {
-      return await prisma.student.findUnique({ where: { id } });
-    } catch (error) {
-      console.error(`Error retrieving student with ID ${id}:`, error);
-      throw error;
-    }
-  }
-
-  // Get all students with related data
-  async getAllStudents(): Promise<Student[]> {
-    try {
-      return await prisma.student.findMany({
-        include: {
-          department: true,
-          degree: true,
-          advisor: { include: { academic_position: true } }
-        }
-      });
-    } catch (error) {
-      console.error('Error retrieving all students:', error);
-      throw error;
-    }
-  }
-
-  // Search students by name or ID
-  async searchStudents(query: string): Promise<Student[]> {
-    try {
-      return await prisma.student.findMany({
-        where: {
-          OR: [
-            { student_id_card: { contains: query } },
-            { first_name: { contains: query } },
-            { last_name: { contains: query } }
-          ]
+export function getAllStudents() {
+  return prisma.student.findMany({
+    select: {
+      id: true,
+      student_id_card: true,
+      first_name: true,
+      last_name: true,
+      picture: true,
+      department: true,
+      degree: true,
+      users: {
+        select: {
+          username: true,
         },
-        include: {
-          department: true,
-          degree: true,
-          advisor: { include: { academic_position: true } }
+      },
+      advisor: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
+    },
+  })
+}
+
+export function getStudentById(id: number) {
+  return prisma.student.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      student_id_card: true,
+      first_name: true,
+      last_name: true,
+      picture: true,
+      department: true,
+      degree: true,
+      users: {
+        select: {
+          username: true,
+        },
+      },
+      advisor: {
+        select: {
+          id: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
+    },
+  })
+}
+
+export function addStudent(newStudent: InStudent) {
+  return prisma.user.create({
+    data: {
+      username: newStudent.username,
+      password: newStudent.password,
+      user_role: {
+        connect: {
+          role_name: 'Student', // Replace "Student" with the actual role name or use an ID
+        },
+      },
+      student: {
+        create: {
+          student_id_card: newStudent.student_id_card,
+          first_name: newStudent.first_name,
+          last_name: newStudent.last_name,
+          picture: newStudent.picture,
+          department_id: newStudent.department_id,
+          degree_id: newStudent.degree_id,
+          advisor_id: null,
+        },
+      },
+    },
+    include: {
+      student: true,
+    },
+  })
+}
+
+export async function getAllStudentPagination(
+  keyword: string,
+  pageSize: number,
+  pageNo: number
+) {
+  const where = {
+    OR: [
+      { student_id_card: { contains: keyword } },
+      { first_name: { contains: keyword } },
+      { last_name: { contains: keyword } },
+    ],
+  }
+
+  const students = await prisma.student.findMany({
+    where,
+    skip: pageSize * (pageNo - 1),
+    take: pageSize,
+    select: {
+      id: true,
+      student_id_card: true,
+      first_name: true,
+      last_name: true,
+      department: true,
+      degree: true,
+      users: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  })
+  const count = await prisma.student.count({ where })
+  return { count, students } as PageStudent
+}
+
+export function getStudentIdByUserId(id: number) {
+  return prisma.user.findFirst({
+    where: {
+      id: id
+    },select:{
+      student_id: true,
+      student:{
+        select:{
+          advisor_id: true,
         }
-      });
-    } catch (error) {
-      console.error(`Error searching students with query "${query}":`, error);
-      throw error;
+      }
     }
+  })
+}
+
+export async function updateStudentById(studentId: number, updatedStudent: InStudent) {
+  
+  const user = await prisma.user.findFirst({
+    where: {
+      student: {
+        id: studentId
+      },
+    },
+  });
+
+  if (!user) {
+    throw new Error('User not found');
   }
 
-  // Update student information
-  async updateStudent(student_id: number, data: Partial<Student>): Promise<Student> {
-    try {
-      return await prisma.student.update({ where: { id: student_id }, data });
-    } catch (error) {
-      console.error(`Error updating student with ID ${student_id}:`, error);
-      throw error;
-    }
-  }
+  return prisma.user.update({
+    where: {
+      id: user.id
+    },
+    data: {
+      username: updatedStudent.username,
+      password: updatedStudent.password,
+      user_role: {
+        connect: {
+          role_name: 'Student'
+        },
+      },
+      student: {
+        update: {
+          student_id_card: updatedStudent.student_id_card,
+          first_name: updatedStudent.first_name,
+          last_name: updatedStudent.last_name,
+          picture: updatedStudent.picture,
+          department_id: updatedStudent.department_id,
+          degree_id: updatedStudent.degree_id,
+          advisor_id: updatedStudent.advisor_id,
+        },
+      },
+    },
+    include: {
+      student: true,
+    },
+  })
+}
 
-  // Update student profile picture
-  async updateProfilePicture(studentId: number, picturePath: string): Promise<Student> {
-    try {
-      return await prisma.student.update({
-        where: { id: studentId },
-        data: { picture: picturePath }
-      });
-    } catch (error) {
-      console.error(`Error updating profile picture for student ID ${studentId}:`, error);
-      throw error;
-    }
-  }
-
-  // Delete student and related data
-  async deleteStudent(student_id: number): Promise<void> {
-    try {
-      // Use transaction to ensure data consistency when deleting related records
-      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-        await tx.appointment.deleteMany({ where: { student_id: student_id } });
-        await tx.feedback.deleteMany({
-          where: { student_id: student_id }
-        });
-        await tx.admin_log.deleteMany({ where: { student_id: student_id } });
-
-        const student = await tx.student.findUnique({ 
-          where: { id: student_id }, 
-          include: { users: true } 
-        });
-
-        await tx.student.delete({ where: { id: student_id } });
-
-        if (student && student.users.length > 0) {
-          for (const user of student.users) {
-            await tx.user.delete({ where: { id: user.id } });
-          }
-        }
-      });
-    } catch (error) {
-      console.error(`Error deleting student with ID ${student_id}:`, error);
-      throw error;
-    }
-  }
+export function countStudent() {
+  return prisma.student.count()
 }

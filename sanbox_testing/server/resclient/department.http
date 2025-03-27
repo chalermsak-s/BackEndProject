@@ -1,0 +1,10 @@
+### Mock DepartmentList
+GET http://localhost:3000/departments HTTP/1.1
+
+### Mock DepartmentListID
+GET http://localhost:3000/departments/1 HTTP/1.1
+
+### Mock DepartmentListID
+GET http://localhost:3000/departments/search/วิศว HTTP/1.1
+
+

@@ -1,0 +1,19 @@
+const currentFeedbackPage = ref(1)
+const pageFeedbackSize = 3
+
+const totalFeedbackPages = computed(() =>
+  Math.ceil(Feedbacks.value.length / pageFeedbackSize)
+)
+
+const currentFeedbackPageItems = computed(() => {
+  const start = (currentFeedbackPage.value - 1) * pageFeedbackSize
+  return Feedbacks.value.slice(start, start + pageFeedbackSize)
+})
+
+const prveFeedback = () => {
+  if (currentFeedbackPage.value > 1) currentFeedbackPage.value--
+}
+
+const nextFeedback = () => {
+  if (currentFeedbackPage.value < totalFeedbackPages.value) currentFeedbackPage.value++
+}

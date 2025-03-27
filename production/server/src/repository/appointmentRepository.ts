@@ -156,8 +156,7 @@ export function confirmAppointment(id: number) {
   return prisma.appointment.update({
     where: { id },
     data: {
-      student_confirmation: true,
-      status_appointment_id: 2,
+      student_confirmation: true
     },
   })
 }
@@ -203,10 +202,10 @@ export function AddAppointmentByStudent(newAppoinment: InAppoinment) {
       appointment_request_date: new Date(
         newAppoinment.appointment_request_date
       ).toISOString(),
-      student_confirmation: Boolean(newAppoinment.student_confirmation),
+      student_confirmation: false,
       student_id: newAppoinment.student_id,
       advisor_id: newAppoinment.advisor_id,
-      status_appointment_id: newAppoinment.status_appointment_id,
+      status_appointment_id: 2,
     },
   })
 }

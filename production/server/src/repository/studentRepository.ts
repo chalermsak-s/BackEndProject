@@ -74,7 +74,7 @@ export function addStudent(newStudent: InStudent) {
           picture: newStudent.picture,
           department_id: newStudent.department_id,
           degree_id: newStudent.degree_id,
-          advisor_id: newStudent.advisor_id,
+          advisor_id: null,
         },
       },
     },

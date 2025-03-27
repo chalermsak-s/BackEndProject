@@ -3,12 +3,12 @@ import type { Advisor } from './advisor'
 import type { Admin } from './admin'
 export interface AdminLog {
   id: number
-  action?: string | null
+  action?: string
   log_date: Date
-  student_id?: number | null
-  advisor_id?: number | null
-  admin_id?: number | null
-  student?: Student | null
-  advisor?: Advisor | null
-  admin?: Admin | null
+  student_id?: number
+  advisor_id?: number
+  admin_id?: number
+  student?: Student
+  advisor?: Advisor
+  admin?: Admin
 }
