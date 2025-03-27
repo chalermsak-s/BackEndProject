@@ -5,7 +5,9 @@ import AnnouncementList from '@/components/AnnouncementList.vue';
 import AppointmentList from '@/components/AppointmentList.vue';
 import FeedbackStudentView from '@/components/FeedbackStudentView.vue';
 import StudentService from '@/services/StudentService';
-
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+library.add(faTriangleExclamation)
 const advisorId = ref<number | null>(null);
 const statusAdvisor = ref<boolean>(false);
 let fetchInterval: number | null = null; // ใช้เก็บตัว interval
@@ -14,7 +16,7 @@ const fetchStudentAdvisor = async () => {
   try {
     const newAdvisorId = await StudentService.getAdvisorIdByUserId(); // ดึงข้อมูลใหม่
     statusAdvisor.value = newAdvisorId !== null;
-    
+
     // เช็คว่า advisorId เปลี่ยนแปลงหรือไม่
     if (newAdvisorId !== advisorId.value) {
       console.log(`Advisor ID changed from ${advisorId.value} to ${newAdvisorId}`);
@@ -55,6 +57,9 @@ watch(statusAdvisor, (newValue, oldValue) => {
       <StudentProfile />
       <!-- Profile Content -->
       <div class="w-full md:w-2/3 lg:w-3/4">
+        <div v-if="!statusAdvisor" role="alert" class="alert alert-vertical alert-dash">
+          <span><font-awesome-icon :icon="['fas', 'triangle-exclamation']" /> กรุณารอการยืนยันการกำหนดอาจารย์ที่ปรึกษาจากระบบก่อนจึงจะสามารถเข้าใช้งานได้</span>
+        </div>
         <AnnouncementList v-if="statusAdvisor" />
         <AppointmentList v-if="statusAdvisor" />
         <Suspense v-if="statusAdvisor">
