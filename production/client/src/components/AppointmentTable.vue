@@ -50,7 +50,7 @@ onMounted(fetchAppointments)
 <template>
     <div class="card bg-white shadow-lg p-4 rounded-lg">
         <div class="card-body">
-            <h2 class="text-xl font-semibold mb-4">ข้อมูลการนัดหมาย</h2>
+            <h2 class="text-xl font-semibold mb-4">ประวัติการนัดหมาย</h2>
             <div class="overflow-x-auto rounded-box border border-base-content/5 mt-3">
                 <table class="table w-full">
                     <thead>

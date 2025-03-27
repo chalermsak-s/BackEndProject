@@ -58,6 +58,9 @@ export async function getAllStudentPagination(
   return pageStudents
 }
 
+export function updateAdvisorIdByStudentId(id: number,advisor_id:number) {
+  return studentRepository.updateAdvisorIdByStudentId(id,advisor_id)
+}
 
 export function count() {
   return studentRepository.countStudent()
