@@ -5,6 +5,8 @@ import AdvisorPost from '@/components/AdvisorPost.vue';
 import AnnouncementAdvisorTable from '@/components/AnnouncementAdvisorTable.vue';
 import AppointmentStatusAdvisor from '@/components/AppointmentStatusAdvisor.vue';
 import AppointmentAdvisorTable from '@/components/AppointmentAdvisorTable.vue';
+import AdvisorStudentDetailView from './AdvisorStudentDetailView.vue';
+
 </script>
 <template>
   <div class="container mx-auto p-4 m-5">
@@ -18,6 +20,8 @@ import AppointmentAdvisorTable from '@/components/AppointmentAdvisorTable.vue';
         <AppointmentStatusAdvisor/>
         <AppointmentAdvisorTable/>
         <AdvisorFeedbackTable />
+        <br>
+        <AdvisorStudentDetailView />
       </div>
     </div>
   </div>
