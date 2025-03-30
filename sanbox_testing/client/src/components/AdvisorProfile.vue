@@ -121,7 +121,7 @@ const fetchApprovedAppointments = async () => {
 
 
 
-onMounted(async () => {
+onMounted(async () => { // มันคือ การสั่งให้ Vue.js เรียกฟังก์ชัน fetchAdvisors,fetchAnnouncements,fetchAppointments,fetchApprovedAppointments เมื่อหน้าเว็บโหลดเสร็จแล้ว
   await fetchAdvisors()
   await fetchAnnouncements()
   await fetchAppointments()

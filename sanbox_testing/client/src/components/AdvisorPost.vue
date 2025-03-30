@@ -1,29 +1,30 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import Swal from 'sweetalert2'
-import apiClient from '@/services/AxiosClient'
+import Swal from 'sweetalert2' // นำเข้า Swal จาก sweetalert2 สำหรับแสดง popup แจ้งเตือน
+import apiClient from '@/services/AxiosClient' // นำเข้า apiClient สำหรับเรียก API
 
 // Inject SweetAlert2
 const $swal = Swal
 
-export interface InAnnouncement {
+// กำหนด Interface และ Reactive State
+export interface InAnnouncement { // กำหนด Interface InAnnouncement สำหรับรูปแบบข้อมูลประกาศ
     topic: string
     description: string
     file: File | null
 }
 
 // Reactive form state
-const form = ref<InAnnouncement>({
+const form = ref<InAnnouncement>({ // สร้าง reactive state form ด้วย ref โดยมีค่าเริ่มต้นเป็น object เปล่า
     topic: '',
     description: '',
     file: null
 })
 
-// Handle file upload
+// การจัดการอัปโหลดไฟล์
 const handleFileUpload = (event: Event) => {
-    const target = event.target as HTMLInputElement
+    const target = event.target as HTMLInputElement // ฟังก์ชันนี้จะทำงานเมื่อผู้ใช้เลือกไฟล์
     if (target.files) {
-        form.value.file = target.files[0] // Capture the file
+        form.value.file = target.files[0] // เก็บไฟล์ที่เลือกไว้ใน form.value.file
     }
 }
 

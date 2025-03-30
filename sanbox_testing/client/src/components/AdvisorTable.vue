@@ -2,10 +2,12 @@
 import AdvisorService from "@/services/AdvisorService";
 import { ref, onMounted, computed } from "vue";
 import type { Advisor } from "@/types";
+
 const advisors = ref<Advisor[]>([]);
 const loading = ref<boolean>(true); // Track loading state
 const error = ref<string | null>(null); // Track any error that occurs
 const searchQuery = ref<string>(""); // เพิ่มตัวแปรสำหรับค้นหา
+
 /* Advisor Start */
 const fetchAdvisors = async () => {
     try {

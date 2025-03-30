@@ -93,7 +93,7 @@ export function addAdvisor(newAdvisor: InAdvisor) {
       password: newAdvisor.password,
       user_role: {
         connect: {
-          role_name: 'Advisor', // Replace "Student" with the actual role name or use an ID
+          role_name: 'Advisor', // เชื่อมกับ role ที่ชื่อ 'Advisor' ในตาราง user_role
         },
       },
       advisor: {
@@ -107,7 +107,7 @@ export function addAdvisor(newAdvisor: InAdvisor) {
       },
     },
     include: {
-      advisor: true,
+      advisor: true, // ให้รวมข้อมูล advisor ที่สร้างมาด้วยในผลลัพธ์ที่คืนค่า
     },
   })
 }
