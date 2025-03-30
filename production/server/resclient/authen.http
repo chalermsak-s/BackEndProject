@@ -10,7 +10,7 @@
 
 GET http://localhost:3000/auth/me HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc0MzA2MzA0NSwiZXhwIjoxNzQzMDY2NjQ1fQ.wGhRgbiqw8do7s_Hoi6cxvlrnFkP6NM92wP23Oc-Nhk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc0MzE2OTYwOCwiZXhwIjoxNzQzMTczMjA4fQ.I6HkXHpjhAVPW-NX7-ACaWRudB5nJwdB2aM8bKmZQxQ
 
 ### Check checkRole
 

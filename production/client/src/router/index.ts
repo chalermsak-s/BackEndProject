@@ -41,6 +41,7 @@ import StudentEditProfileView from '@/views/student/StudentEditProfileView.vue'
 import StudentAddAppointmentView from '@/views/student/StudentAddAppointmentView.vue'
 import StudentAnnouncementsDetailView from '@/views/student/StudentAnnouncementsDetailView.vue'
 import StudentAppointmentDetailView from '@/views/student/StudentAppointmentDetailView.vue'
+import AdvisorStudentDetailView2 from '@/views/advisor/AdvisorStudentDetailView2.vue'
 
 
 const router = createRouter({
@@ -495,6 +496,44 @@ const router = createRouter({
         }
       },
     },
+    {
+      path: '/advisor/detail/student/:id',
+      name: 'advisor-student-detail-view',
+      component: AdvisorStudentDetailView2,
+      props: true,
+      beforeEnter: async (to: any) => {
+        const authStore = useAuthStore()
+        if (!authStore.isAdvisor) {
+          return {
+            name: '404-resource-view',
+            params: { resource: 'you-are-not-allowed-to-access' },
+          }
+        } else {
+          const id = Number(to.params.id) // ป้องกัน NaN
+          if (isNaN(id)) {
+            return {
+              name: '404-resource-view',
+              params: { resource: 'student' },
+            }
+          }
+
+          const studentStore = useStudentStore()
+
+          try {
+            const response = await studentService.getStudent(id)
+            studentStore.setStore(response.data)
+            return true // อนุญาตให้ไปต่อ
+          } catch (error: any) {
+            console.error('Fetch Student Error:', error) // เพิ่ม log สำหรับ debug
+            const status = error.response?.status
+            return status === 404
+              ? { name: '404-resource-view', params: { resource: 'student' } }
+              : { name: 'network-error-view' }
+          }
+        }
+      },
+    },
+
     /* Advisor End */
 
     /* Student Start */
